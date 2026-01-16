@@ -1,0 +1,82 @@
+// User information from JWT token
+export interface UserInfo {
+  sub: string;
+  email?: string;
+  name?: string;
+  preferred_username?: string;
+  email_verified?: boolean;
+  given_name?: string;
+  family_name?: string;
+}
+
+// Auth context type
+export interface AuthContextType {
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  accessToken: string | null;
+  refreshToken: string | null;
+  user: UserInfo | null;
+  accessTokenExpiresAt: Date | null;
+  refreshTokenExpiresAt: Date | null;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
+  refreshAccessToken: () => Promise<void>;
+}
+
+// Token storage structure
+export interface StoredTokens {
+  accessToken: string;
+  refreshToken: string;
+  accessTokenExpiresAt: string;
+  refreshTokenExpiresAt: string;
+}
+
+// API response types
+export interface ApiResponse<T> {
+  _status: number;
+  data?: T;
+  error?: {
+    type: string;
+    message: string;
+  };
+}
+
+export interface UserData {
+  id: string;
+  email: string;
+  keycloak_user_id: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+  username: string;
+  email_verified: boolean;
+}
+
+// JWT token parts
+export interface JWTHeader {
+  alg: string;
+  typ: string;
+  kid?: string;
+}
+
+export interface JWTPayload extends UserInfo {
+  iss?: string;
+  aud?: string | string[];
+  exp?: number;
+  iat?: number;
+  auth_time?: number;
+  azp?: string;
+  scope?: string;
+  sid?: string;
+  realm_access?: {
+    roles: string[];
+  };
+  resource_access?: Record<string, { roles: string[] }>;
+}
+
+// Decoded JWT structure
+export interface DecodedJWT {
+  header: JWTHeader;
+  payload: JWTPayload;
+  raw: string;
+}
