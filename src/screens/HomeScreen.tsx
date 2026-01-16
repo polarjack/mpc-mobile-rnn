@@ -5,10 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  SafeAreaView,
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/useAuth';
 import { CountdownTimer } from '../components/CountdownTimer';
 import { TokenDisplay } from '../components/TokenDisplay';

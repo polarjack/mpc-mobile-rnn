@@ -12,6 +12,7 @@ React Native (Expo) iOS application demonstrating OAuth 2.0 Authorization Code F
 - **OAuth/OIDC**: expo-auth-session
 - **Secure Storage**: expo-secure-store (iOS Keychain)
 - **State Management**: React Context
+- **Package Manager**: pnpm
 
 ## Project Structure
 
@@ -41,17 +42,20 @@ MpcMobile/
 ## Commands
 
 ```bash
+# Install dependencies
+pnpm install
+
 # Start development server
-npm start
+pnpm start
 
 # Run on iOS simulator
-npm run ios
+pnpm ios
 
 # Run on Android emulator
-npm run android
+pnpm android
 
 # TypeScript type check
-npm run typecheck
+pnpm typecheck
 ```
 
 ## Configuration

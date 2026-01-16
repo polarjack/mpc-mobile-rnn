@@ -9,8 +9,11 @@ import type { AuthContextType, UserInfo, StoredTokens, JWTPayload } from '../typ
 // Complete browser auth session
 WebBrowser.maybeCompleteAuthSession();
 
-// Secure storage keys
-const TOKENS_KEY = 'auth_tokens';
+// Secure storage keys - store separately to avoid 2KB limit
+const ACCESS_TOKEN_KEY = 'auth_access_token';
+const REFRESH_TOKEN_KEY = 'auth_refresh_token';
+const ACCESS_TOKEN_EXPIRY_KEY = 'auth_access_token_expiry';
+const REFRESH_TOKEN_EXPIRY_KEY = 'auth_refresh_token_expiry';
 
 // Token refresh interval (60 seconds before expiry check)
 const TOKEN_REFRESH_INTERVAL = 60000;
@@ -84,17 +87,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     discovery
   );
 
-  // Save tokens to secure storage
+  // Save tokens to secure storage (stored separately to avoid 2KB limit)
   const saveTokens = async (tokens: StoredTokens) => {
-    await SecureStore.setItemAsync(TOKENS_KEY, JSON.stringify(tokens));
+    await Promise.all([
+      SecureStore.setItemAsync(ACCESS_TOKEN_KEY, tokens.accessToken),
+      SecureStore.setItemAsync(REFRESH_TOKEN_KEY, tokens.refreshToken),
+      SecureStore.setItemAsync(ACCESS_TOKEN_EXPIRY_KEY, tokens.accessTokenExpiresAt),
+      SecureStore.setItemAsync(REFRESH_TOKEN_EXPIRY_KEY, tokens.refreshTokenExpiresAt),
+    ]);
   };
 
   // Load tokens from secure storage
   const loadTokens = async (): Promise<StoredTokens | null> => {
     try {
-      const stored = await SecureStore.getItemAsync(TOKENS_KEY);
-      if (stored) {
-        return JSON.parse(stored);
+      const [accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt] = await Promise.all([
+        SecureStore.getItemAsync(ACCESS_TOKEN_KEY),
+        SecureStore.getItemAsync(REFRESH_TOKEN_KEY),
+        SecureStore.getItemAsync(ACCESS_TOKEN_EXPIRY_KEY),
+        SecureStore.getItemAsync(REFRESH_TOKEN_EXPIRY_KEY),
+      ]);
+
+      if (accessToken && refreshToken && accessTokenExpiresAt && refreshTokenExpiresAt) {
+        return { accessToken, refreshToken, accessTokenExpiresAt, refreshTokenExpiresAt };
       }
     } catch (error) {
       console.error('Failed to load tokens:', error);
@@ -104,7 +118,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Clear tokens from secure storage
   const clearTokens = async () => {
-    await SecureStore.deleteItemAsync(TOKENS_KEY);
+    await Promise.all([
+      SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+      SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+      SecureStore.deleteItemAsync(ACCESS_TOKEN_EXPIRY_KEY),
+      SecureStore.deleteItemAsync(REFRESH_TOKEN_EXPIRY_KEY),
+    ]);
   };
 
   // Update state with token data
