@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   FlatList,
   ActivityIndicator,
   Alert,
@@ -25,6 +25,44 @@ import type { VaultMember, VaultRole, Pagination } from '../types';
 
 const ROLES: VaultRole[] = ['OWNER', 'ADMIN', 'SIGNER', 'VIEWER'];
 const PAGE_SIZE = 20;
+
+const keyExtractor = (item: VaultMember) => item.userId;
+
+interface MemberRowProps {
+  item: VaultMember;
+  canManage: boolean;
+  onPress: (member: VaultMember) => void;
+}
+
+const MemberRow = React.memo<MemberRowProps>(({ item, canManage, onPress }) => {
+  const handlePress = useCallback(() => onPress(item), [onPress, item]);
+
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.memberRow, canManage && pressed && { opacity: 0.7 }]}
+      onPress={handlePress}
+      disabled={!canManage}
+    >
+      <View style={styles.memberInfo}>
+        <Text style={styles.memberName} numberOfLines={1}>
+          {item.name || item.email}
+        </Text>
+        {item.name ? (
+          <Text style={styles.memberEmail} numberOfLines={1}>
+            {item.email}
+          </Text>
+        ) : null}
+      </View>
+      <View
+        style={[styles.roleBadge, { backgroundColor: getRoleColor(item.role) + '20' }]}
+      >
+        <Text style={[styles.roleText, { color: getRoleColor(item.role) }]}>
+          {item.role}
+        </Text>
+      </View>
+    </Pressable>
+  );
+});
 
 interface Props {
   vaultId: string;
@@ -91,31 +129,34 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
     }, 300);
   };
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     if (!pagination || pagination.page >= pagination.totalPages || loadingMore) return;
     setLoadingMore(true);
     loadMembers(pagination.page + 1, search, true).then(() => setLoadingMore(false));
-  };
+  }, [pagination, loadingMore, loadMembers, search]);
 
-  const handleMemberPress = (member: VaultMember) => {
-    if (!myRole || !canManageMembers(myRole) || !canManageMember(myRole, member.role)) return;
+  const handleMemberPress = useCallback(
+    (member: VaultMember) => {
+      if (!myRole || !canManageMembers(myRole) || !canManageMember(myRole, member.role)) return;
 
-    const options: Array<{ text: string; onPress?: () => void; style?: 'cancel' | 'destructive' }> =
-      [
-        {
-          text: 'Edit Role',
-          onPress: () => showRolePicker(member),
-        },
-        {
-          text: 'Remove Member',
-          style: 'destructive',
-          onPress: () => confirmRemoveMember(member),
-        },
-        { text: 'Cancel', style: 'cancel' },
-      ];
+      const options: Array<{ text: string; onPress?: () => void; style?: 'cancel' | 'destructive' }> =
+        [
+          {
+            text: 'Edit Role',
+            onPress: () => showRolePicker(member),
+          },
+          {
+            text: 'Remove Member',
+            style: 'destructive',
+            onPress: () => confirmRemoveMember(member),
+          },
+          { text: 'Cancel', style: 'cancel' },
+        ];
 
-    Alert.alert(member.name || member.email, `Current role: ${member.role}`, options);
-  };
+      Alert.alert(member.name || member.email, `Current role: ${member.role}`, options);
+    },
+    [myRole],
+  );
 
   const showRolePicker = (member: VaultMember) => {
     const availableRoles = ROLES.filter(
@@ -193,36 +234,13 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
     }
   };
 
-  const renderMember = ({ item }: { item: VaultMember }) => {
-    const pressable =
-      myRole && canManageMembers(myRole) && canManageMember(myRole, item.role);
-    return (
-      <TouchableOpacity
-        style={styles.memberRow}
-        onPress={() => handleMemberPress(item)}
-        disabled={!pressable}
-        activeOpacity={pressable ? 0.7 : 1}
-      >
-        <View style={styles.memberInfo}>
-          <Text style={styles.memberName} numberOfLines={1}>
-            {item.name || item.email}
-          </Text>
-          {item.name ? (
-            <Text style={styles.memberEmail} numberOfLines={1}>
-              {item.email}
-            </Text>
-          ) : null}
-        </View>
-        <View
-          style={[styles.roleBadge, { backgroundColor: getRoleColor(item.role) + '20' }]}
-        >
-          <Text style={[styles.roleText, { color: getRoleColor(item.role) }]}>
-            {item.role}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+  const renderMember = useCallback(
+    ({ item }: { item: VaultMember }) => {
+      const canManage = !!(myRole && canManageMembers(myRole) && canManageMember(myRole, item.role));
+      return <MemberRow item={item} canManage={canManage} onPress={handleMemberPress} />;
+    },
+    [myRole, handleMemberPress],
+  );
 
   if (loading && members.length === 0) {
     return (
@@ -238,14 +256,20 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Pressable
+          onPress={() => router.back()}
+          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
+        >
           <Text style={styles.backText}>← Back</Text>
-        </TouchableOpacity>
+        </Pressable>
         <Text style={styles.headerTitle}>Members</Text>
         {myRole && canManageMembers(myRole) && (
-          <TouchableOpacity style={styles.addButton} onPress={() => setShowAddModal(true)}>
+          <Pressable
+            style={({ pressed }) => [styles.addButton, pressed && { opacity: 0.7 }]}
+            onPress={() => setShowAddModal(true)}
+          >
             <Text style={styles.addButtonText}>+ Add</Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -265,7 +289,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
       {/* List */}
       <FlatList
         data={members}
-        keyExtractor={(item) => item.userId}
+        keyExtractor={keyExtractor}
         renderItem={renderMember}
         contentContainerStyle={styles.listContent}
         onEndReached={handleLoadMore}
@@ -302,14 +326,15 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
             <Text style={styles.modalLabel}>Role</Text>
             <View style={styles.rolePickerRow}>
               {ROLES.filter((r) => myRole && canManageMember(myRole, r)).map((role) => (
-                <TouchableOpacity
+                <Pressable
                   key={role}
-                  style={[
+                  style={({ pressed }) => [
                     styles.roleOption,
                     addRole === role && {
                       backgroundColor: getRoleColor(role) + '20',
                       borderColor: getRoleColor(role),
                     },
+                    pressed && { opacity: 0.7 },
                   ]}
                   onPress={() => setAddRole(role)}
                 >
@@ -321,13 +346,17 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
                   >
                     {role}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               ))}
             </View>
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modalButton,
+                  styles.cancelButton,
+                  pressed && { opacity: 0.7 },
+                ]}
                 onPress={() => {
                   setShowAddModal(false);
                   setAddEmail('');
@@ -335,9 +364,13 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
                 }}
               >
                 <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.submitButton]}
+              </Pressable>
+              <Pressable
+                style={({ pressed }) => [
+                  styles.modalButton,
+                  styles.submitButton,
+                  pressed && { opacity: 0.7 },
+                ]}
                 onPress={handleAddMember}
                 disabled={addLoading || !addEmail.trim()}
               >
@@ -346,7 +379,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
                 ) : (
                   <Text style={styles.submitButtonText}>Add</Text>
                 )}
-              </TouchableOpacity>
+              </Pressable>
             </View>
           </View>
         </View>

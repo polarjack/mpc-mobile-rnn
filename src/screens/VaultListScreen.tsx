@@ -1,9 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   FlatList,
   ActivityIndicator,
   Alert,
@@ -15,6 +15,56 @@ import { useAuth } from '../hooks/useAuth';
 import { fetchVaults, fetchUserProfile } from '../services/api';
 import { getRoleColor } from '../utils/permissions';
 import type { Vault, VaultRole, VaultMembership } from '../types';
+
+const keyExtractor = (item: Vault) => item.id;
+
+interface VaultCardProps {
+  item: Vault;
+  role: VaultRole | undefined;
+  onPress: (id: string) => void;
+}
+
+const VaultCard = React.memo<VaultCardProps>(({ item, role, onPress }) => {
+  const handlePress = useCallback(() => onPress(item.id), [onPress, item.id]);
+
+  return (
+    <Pressable
+      style={({ pressed }) => [styles.card, pressed && { opacity: 0.7 }]}
+      onPress={handlePress}
+    >
+      <View style={styles.cardHeader}>
+        <Text style={styles.vaultName} numberOfLines={1}>
+          {item.name}
+        </Text>
+        <View
+          style={[
+            styles.statusBadge,
+            { backgroundColor: item.activated ? '#e8f5e9' : '#fce4ec' },
+          ]}
+        >
+          <Text
+            style={[
+              styles.statusText,
+              { color: item.activated ? '#4caf50' : '#f44336' },
+            ]}
+          >
+            {item.activated ? 'Active' : 'Inactive'}
+          </Text>
+        </View>
+      </View>
+      {role && (
+        <View style={[styles.roleBadge, { backgroundColor: getRoleColor(role) + '20' }]}>
+          <Text style={[styles.roleText, { color: getRoleColor(role) }]}>{role}</Text>
+        </View>
+      )}
+      {item.businessEmail ? (
+        <Text style={styles.vaultEmail} numberOfLines={1}>
+          {item.businessEmail}
+        </Text>
+      ) : null}
+    </Pressable>
+  );
+});
 
 export const VaultListScreen: React.FC = () => {
   const { accessToken, logout, isLoading } = useAuth();
@@ -55,10 +105,10 @@ export const VaultListScreen: React.FC = () => {
     }, [loadData]),
   );
 
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
     loadData();
-  };
+  }, [loadData]);
 
   const handleLogout = () => {
     Alert.alert('Confirm Logout', 'Are you sure you want to sign out?', [
@@ -67,52 +117,28 @@ export const VaultListScreen: React.FC = () => {
     ]);
   };
 
-  const getRoleForVault = (vaultId: string): VaultRole | undefined => {
-    const m = memberships.find((mem) => mem.vaultId === vaultId);
-    return m?.role;
-  };
+  const membershipMap = useMemo(() => {
+    const map = new Map<string, VaultRole>();
+    for (const m of memberships) {
+      map.set(m.vaultId, m.role);
+    }
+    return map;
+  }, [memberships]);
 
-  const renderVaultCard = ({ item }: { item: Vault }) => {
-    const role = getRoleForVault(item.id);
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => router.push(`/vaults/${item.id}`)}
-        activeOpacity={0.7}
-      >
-        <View style={styles.cardHeader}>
-          <Text style={styles.vaultName} numberOfLines={1}>
-            {item.name}
-          </Text>
-          <View
-            style={[
-              styles.statusBadge,
-              { backgroundColor: item.activated ? '#e8f5e9' : '#fce4ec' },
-            ]}
-          >
-            <Text
-              style={[
-                styles.statusText,
-                { color: item.activated ? '#4caf50' : '#f44336' },
-              ]}
-            >
-              {item.activated ? 'Active' : 'Inactive'}
-            </Text>
-          </View>
-        </View>
-        {role && (
-          <View style={[styles.roleBadge, { backgroundColor: getRoleColor(role) + '20' }]}>
-            <Text style={[styles.roleText, { color: getRoleColor(role) }]}>{role}</Text>
-          </View>
-        )}
-        {item.businessEmail ? (
-          <Text style={styles.vaultEmail} numberOfLines={1}>
-            {item.businessEmail}
-          </Text>
-        ) : null}
-      </TouchableOpacity>
-    );
-  };
+  const handleVaultPress = useCallback(
+    (id: string) => {
+      router.push(`/vaults/${id}`);
+    },
+    [router],
+  );
+
+  const renderVaultCard = useCallback(
+    ({ item }: { item: Vault }) => {
+      const role = membershipMap.get(item.id);
+      return <VaultCard item={item} role={role} onPress={handleVaultPress} />;
+    },
+    [membershipMap, handleVaultPress],
+  );
 
   if (loading) {
     return (
@@ -128,17 +154,17 @@ export const VaultListScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>MPC Mobile</Text>
-        <TouchableOpacity
-          style={styles.logoutButton}
+        <Pressable
+          style={({ pressed }) => [styles.logoutButton, pressed && { opacity: 0.7 }]}
           onPress={handleLogout}
           disabled={isLoading}
         >
           <Text style={styles.logoutButtonText}>Sign Out</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <FlatList
         data={vaults}
-        keyExtractor={(item) => item.id}
+        keyExtractor={keyExtractor}
         renderItem={renderVaultCard}
         contentContainerStyle={styles.listContent}
         refreshControl={

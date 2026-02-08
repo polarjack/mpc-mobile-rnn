@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   ActivityIndicator,
   Alert,
@@ -59,9 +59,12 @@ export const VaultUserProfileScreen: React.FC<Props> = ({ vaultId }) => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
+          >
             <Text style={styles.backText}>← Back</Text>
-          </TouchableOpacity>
+          </Pressable>
           <Text style={styles.headerTitle}>My Vault Profile</Text>
         </View>
 

@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   ActivityIndicator,
   Alert,
@@ -83,13 +83,13 @@ export const HomeScreen: React.FC = () => {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.headerTitle}>MPC Mobile</Text>
-          <TouchableOpacity
-            style={styles.logoutButton}
+          <Pressable
+            style={({ pressed }) => [styles.logoutButton, pressed && { opacity: 0.7 }]}
             onPress={handleLogout}
             disabled={isLoading}
           >
             <Text style={styles.logoutButtonText}>Sign Out</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* User Info */}
@@ -130,8 +130,12 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Actions</Text>
           <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.refreshButton]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                styles.refreshButton,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={handleRefreshToken}
               disabled={isRefreshing}
             >
@@ -140,10 +144,14 @@ export const HomeScreen: React.FC = () => {
               ) : (
                 <Text style={styles.actionButtonText}>Refresh Token</Text>
               )}
-            </TouchableOpacity>
+            </Pressable>
 
-            <TouchableOpacity
-              style={[styles.actionButton, styles.apiButton]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.actionButton,
+                styles.apiButton,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={handleFetchProfile}
               disabled={isLoadingApi}
             >
@@ -152,7 +160,7 @@ export const HomeScreen: React.FC = () => {
               ) : (
                 <Text style={styles.actionButtonText}>Backend API</Text>
               )}
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
 

@@ -10,6 +10,9 @@ A React Native (Expo) iOS application demonstrating OAuth 2.0 Authorization Code
 - Automatic token refresh
 - Protected route navigation
 - JWT token visualization
+- Vault management (list, detail, settings)
+- Member management (CRUD with role-based permissions)
+- Per-vault user profiles
 
 ## Tech Stack
 
@@ -92,18 +95,32 @@ MpcMobile/
 ├── app/                          # Expo Router pages
 │   ├── _layout.tsx              # Root layout with AuthProvider
 │   ├── index.tsx                # Sign-in page (entry point)
-│   └── home.tsx                 # Protected home page
+│   ├── home.tsx                 # Protected home page
+│   └── vaults/
+│       ├── _layout.tsx          # Vault stack layout
+│       ├── index.tsx            # Vault list page
+│       ├── [id].tsx             # Vault detail page
+│       └── [id]/
+│           ├── members.tsx      # Vault members page
+│           ├── settings.tsx     # Vault settings page
+│           └── profile.tsx      # Vault user profile page
 ├── src/
 │   ├── config/auth.ts           # Keycloak OAuth configuration
 │   ├── context/AuthContext.tsx  # Auth provider with token management
 │   ├── hooks/useAuth.ts         # Custom hook for auth context
 │   ├── screens/
 │   │   ├── SignInScreen.tsx     # Login screen
-│   │   └── HomeScreen.tsx       # Main authenticated screen
+│   │   ├── HomeScreen.tsx       # Main authenticated screen
+│   │   ├── VaultListScreen.tsx  # Vault list with memoized VaultCard
+│   │   ├── VaultDetailScreen.tsx # Vault detail view
+│   │   ├── VaultMembersScreen.tsx # Members list with memoized MemberRow
+│   │   ├── VaultSettingsScreen.tsx # Vault settings form
+│   │   └── VaultUserProfileScreen.tsx # Per-vault user profile
 │   ├── components/
 │   │   ├── CountdownTimer.tsx   # Token expiration countdown
 │   │   └── TokenDisplay.tsx     # JWT token viewer
 │   ├── services/api.ts          # Backend API client
+│   ├── utils/permissions.ts     # Role-based permission helpers
 │   └── types/index.ts           # TypeScript type definitions
 ├── app.json                      # Expo config (URL scheme, env vars)
 ├── package.json
@@ -199,9 +216,24 @@ sequenceDiagram
 
 ## API Integration
 
-The app integrates with a backend API. Main endpoint:
+The app integrates with a backend API. Endpoints:
 
 - `GET /api/v1/users/me` - Fetch authenticated user profile
+- `GET /api/v1/vaults` - List vaults
+- `GET /api/v1/vaults/:id` - Get vault details
+- `PUT /api/v1/vaults/:id` - Update vault settings
+- `GET /api/v1/vaults/:id/profile` - Get per-vault user profile
+- `GET /api/v1/vaults/:id/members` - List vault members (paginated, searchable)
+- `POST /api/v1/vaults/:id/members` - Add vault member
+- `PUT /api/v1/vaults/:id/members/:userId` - Update member role
+- `DELETE /api/v1/vaults/:id/members/:userId` - Remove member
+
+## Performance Patterns
+
+- **Pressable**: All touchable elements use `Pressable` instead of the legacy `TouchableOpacity`, with `style={({pressed}) => [...]}` for press feedback
+- **Memoized list items**: FlatList items are extracted as `React.memo` components (`VaultCard`, `MemberRow`) to prevent unnecessary re-renders
+- **Stable callbacks**: `keyExtractor` hoisted to module scope; `renderItem`, `onRefresh`, and `onEndReached` wrapped in `useCallback`
+- **O(1) lookups**: Vault membership roles use a `useMemo` `Map` instead of linear `.find()` searches
 
 ## Development Notes
 

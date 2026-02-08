@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,8 +28,12 @@ export const SignInScreen: React.FC = () => {
             Sign in with your Keycloak SSO account to access the application.
           </Text>
 
-          <TouchableOpacity
-            style={[styles.button, isLoading && styles.buttonDisabled]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.button,
+              isLoading && styles.buttonDisabled,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={login}
             disabled={isLoading}
           >
@@ -38,7 +42,7 @@ export const SignInScreen: React.FC = () => {
             ) : (
               <Text style={styles.buttonText}>Sign In with SSO</Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         <View style={styles.footer}>

@@ -60,6 +60,10 @@ Custom URL scheme `com.mpcmobile.auth` is registered in `app.json` under `expo.s
 - **Token storage keys**: `auth_access_token`, `auth_refresh_token`, `auth_access_token_expiry`, `auth_refresh_token_expiry` (stored individually in Keychain).
 - **OAuth scopes**: `openid`, `profile`, `email`, `offline_access`.
 - **Keycloak endpoints**: Built dynamically from realm URL in `src/config/auth.ts` via `getDiscoveryDocument()`.
+- **Pressable over TouchableOpacity**: All touchable elements use `Pressable` with `style={({pressed}) => [baseStyle, pressed && {opacity: 0.7}]}`. No `TouchableOpacity` usage in the codebase.
+- **Memoized list items**: FlatList `renderItem` components are extracted as `React.memo` components (`VaultCard`, `MemberRow`) with stable `onPress` callbacks via `useCallback`.
+- **Stable FlatList callbacks**: `keyExtractor` hoisted to module scope, `renderItem`/`onRefresh`/`onEndReached` wrapped in `useCallback`.
+- **O(1) membership lookup**: `VaultListScreen` uses a `useMemo` `Map<string, VaultRole>` for vault-to-role mapping instead of `.find()`.
 - **Screen patterns**: `SafeAreaView` + `ScrollView`/`FlatList` container, white cards with `borderRadius: 12` and shadow, `ActivityIndicator` for loading, `Alert.alert` for confirmations/errors. Colors: blue `#1976d2`, green `#4caf50`, orange `#ff9800`, red `#f44336`, bg `#f5f5f5`.
 - **Vault members screen**: Debounced search (300ms), infinite scroll pagination via `onEndReached`, modal for adding members, ActionSheet for edit/remove (permission-gated).
 - **No test framework configured** — no test files or Jest config exist yet.

@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
 } from 'react-native';
 import type { DecodedJWT, JWTHeader, JWTPayload } from '../types';
@@ -88,19 +88,23 @@ export const TokenDisplay: React.FC<TokenDisplayProps> = ({
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.header}
+      <Pressable
+        style={({ pressed }) => [styles.header, pressed && { opacity: 0.7 }]}
         onPress={() => setIsExpanded(!isExpanded)}
       >
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.expandIcon}>{isExpanded ? '▼' : '▶'}</Text>
-      </TouchableOpacity>
+      </Pressable>
 
       {isExpanded && (
         <View style={styles.content}>
           <View style={styles.tabs}>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'header' && styles.activeTab]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.tab,
+                activeTab === 'header' && styles.activeTab,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => setActiveTab('header')}
             >
               <Text
@@ -111,9 +115,13 @@ export const TokenDisplay: React.FC<TokenDisplayProps> = ({
               >
                 Header
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'payload' && styles.activeTab]}
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.tab,
+                activeTab === 'payload' && styles.activeTab,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => setActiveTab('payload')}
             >
               <Text
@@ -124,9 +132,13 @@ export const TokenDisplay: React.FC<TokenDisplayProps> = ({
               >
                 Payload
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.tab, activeTab === 'raw' && styles.activeTab]}
+            </Pressable>
+            <Pressable
+              style={({ pressed }) => [
+                styles.tab,
+                activeTab === 'raw' && styles.activeTab,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => setActiveTab('raw')}
             >
               <Text
@@ -137,7 +149,7 @@ export const TokenDisplay: React.FC<TokenDisplayProps> = ({
               >
                 Raw
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           <View style={styles.contentBody}>{renderContent()}</View>

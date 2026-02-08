@@ -3,7 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   ScrollView,
   ActivityIndicator,
   Alert,
@@ -74,9 +74,12 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Pressable
+            onPress={() => router.back()}
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
+          >
             <Text style={styles.backText}>← Back</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
         {/* Vault Info */}
@@ -124,28 +127,40 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Actions</Text>
 
-          <TouchableOpacity
-            style={[styles.navButton, styles.primaryButton]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.navButton,
+              styles.primaryButton,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={() => router.push(`/vaults/${vaultId}/members`)}
           >
             <Text style={styles.navButtonText}>Members</Text>
-          </TouchableOpacity>
+          </Pressable>
 
           {showSettings && (
-            <TouchableOpacity
-              style={[styles.navButton, styles.settingsButton]}
+            <Pressable
+              style={({ pressed }) => [
+                styles.navButton,
+                styles.settingsButton,
+                pressed && { opacity: 0.7 },
+              ]}
               onPress={() => router.push(`/vaults/${vaultId}/settings`)}
             >
               <Text style={styles.navButtonText}>Settings</Text>
-            </TouchableOpacity>
+            </Pressable>
           )}
 
-          <TouchableOpacity
-            style={[styles.navButton, styles.profileButton]}
+          <Pressable
+            style={({ pressed }) => [
+              styles.navButton,
+              styles.profileButton,
+              pressed && { opacity: 0.7 },
+            ]}
             onPress={() => router.push(`/vaults/${vaultId}/profile`)}
           >
             <Text style={styles.navButtonText}>My Profile</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
     </SafeAreaView>
