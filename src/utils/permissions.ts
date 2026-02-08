@@ -14,7 +14,7 @@ export const canEditVault = (role: VaultRole): boolean =>
   role === 'OWNER' || role === 'ADMIN';
 
 export const canManageMember = (currentRole: VaultRole, targetRole: VaultRole): boolean =>
-  ROLE_HIERARCHY[currentRole] > ROLE_HIERARCHY[targetRole];
+  ROLE_HIERARCHY[currentRole] >= ROLE_HIERARCHY[targetRole]; // currently setup as can only manage members with same or lower role.
 
 export const getRoleColor = (role: VaultRole): string => {
   switch (role) {
