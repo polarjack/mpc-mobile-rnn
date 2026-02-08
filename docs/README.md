@@ -23,6 +23,7 @@ MPC Mobile is a React Native (Expo) iOS application that provides multi-party co
 | [API Reference](./04-api-reference.md) | Dev, QA | All REST API endpoints, types, error handling |
 | [SSO Integration](./05-sso-integration.md) | Dev | OAuth 2.0 PKCE flow, Keycloak config, token lifecycle |
 | [Role & Permissions](./06-role-permissions.md) | PM, QA | Role hierarchy, permission matrix, test matrix |
+| [Sprint Retro Report](./07-sprint-retro-report.md) | PM, Dev, QA | Project analysis, effort estimation (90 SP), ticket mapping |
 
 ### By Audience
 
