@@ -1,27 +1,28 @@
 import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../src/hooks/useAuth';
+import { useAuth } from '../../src/hooks/useAuth';
+import { VaultListScreen } from '../../src/screens/VaultListScreen';
 
-export default function Home() {
+export default function VaultsIndex() {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        router.replace('/vaults');
-      } else {
-        router.replace('/');
-      }
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/');
     }
   }, [isAuthenticated, isLoading, router]);
 
-  return (
-    <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#1976d2" />
-    </View>
-  );
+  if (isLoading || !isAuthenticated) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1976d2" />
+      </View>
+    );
+  }
+
+  return <VaultListScreen />;
 }
 
 const styles = StyleSheet.create({

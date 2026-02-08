@@ -41,15 +41,107 @@ export interface ApiResponse<T> {
   };
 }
 
+export type VaultRole = 'OWNER' | 'ADMIN' | 'SIGNER' | 'VIEWER';
+
+export interface VaultMembership {
+  vaultId: string;
+  vaultName: string;
+  role: VaultRole;
+  joinedAt: string;
+}
+
 export interface UserData {
-  id: string;
+  userId: string;
+  keycloakUserId: string;
   email: string;
-  keycloak_user_id: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
   username: string;
-  email_verified: boolean;
+  emailVerified: boolean;
+  vaultMemberships: VaultMembership[];
+}
+
+export interface Vault {
+  id: string;
+  name: string;
+  businessEmail: string;
+  phone: string;
+  websiteUrl: string;
+  tssCoordinatorEndpoint: string;
+  activated: boolean;
+  updatedAt: string;
+}
+
+export interface VaultUserData {
+  userId: string;
+  keycloakUserId: string;
+  email: string;
+  username: string;
+  emailVerified: boolean;
+  vaultId: string;
+  role: VaultRole;
+  permissions: string[];
+}
+
+export interface VaultMember {
+  userId: string;
+  name: string;
+  email: string;
+  role: VaultRole;
+  joinedAt: string;
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+}
+
+export interface VaultMembersData {
+  vaultId: string;
+  members: VaultMember[];
+  pagination: Pagination;
+}
+
+export interface UpdateVaultRequest {
+  name: string;
+  businessEmail: string;
+  phone: string;
+  websiteUrl?: string | null;
+}
+
+export interface AddVaultMemberRequest {
+  email: string;
+  role: VaultRole;
+}
+
+export interface AddVaultMemberResponse {
+  vaultId: string;
+  userId: string;
+  role: string;
+  message: string;
+}
+
+export interface UpdateVaultMemberRoleRequest {
+  role: VaultRole;
+}
+
+export interface UpdateVaultMemberRoleResponse {
+  vaultId: string;
+  userId: string;
+  role: string;
+  message: string;
+}
+
+export interface DeleteVaultMemberResponse {
+  vaultId: string;
+  userId: string;
+  message: string;
+}
+
+export interface FetchVaultMembersParams {
+  page?: number;
+  pageSize?: number;
+  search?: string;
 }
 
 // JWT token parts

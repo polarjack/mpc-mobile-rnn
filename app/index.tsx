@@ -10,7 +10,7 @@ export default function Index() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/home');
+      router.replace('/vaults');
     }
   }, [isAuthenticated, isLoading, router]);
 
