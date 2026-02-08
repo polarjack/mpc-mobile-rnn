@@ -1,123 +1,51 @@
-# MpcMobile - Claude Code Guide
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-React Native (Expo) iOS application demonstrating OAuth 2.0 Authorization Code Flow with PKCE using Keycloak SSO and backend API integration with JWT tokens.
-
-## Tech Stack
-
-- **Framework**: Expo SDK 54
-- **Language**: TypeScript (strict mode)
-- **Navigation**: expo-router v6
-- **OAuth/OIDC**: expo-auth-session
-- **Secure Storage**: expo-secure-store (iOS Keychain)
-- **State Management**: React Context
-- **Package Manager**: pnpm
-
-## Project Structure
-
-```
-MpcMobile/
-├── app/                          # Expo Router pages
-│   ├── _layout.tsx              # Root layout with AuthProvider
-│   ├── index.tsx                # Sign-in page (entry point)
-│   └── home.tsx                 # Protected home page
-├── src/
-│   ├── config/auth.ts           # Keycloak OAuth configuration
-│   ├── context/AuthContext.tsx  # Auth provider with token management
-│   ├── hooks/useAuth.ts         # Custom hook for auth context
-│   ├── screens/
-│   │   ├── SignInScreen.tsx     # Login screen
-│   │   └── HomeScreen.tsx       # Main authenticated screen
-│   ├── components/
-│   │   ├── CountdownTimer.tsx   # Token expiration countdown
-│   │   └── TokenDisplay.tsx     # JWT token viewer
-│   ├── services/api.ts          # Backend API client
-│   └── types/index.ts           # TypeScript type definitions
-├── app.json                      # Expo config (URL scheme, env vars)
-├── package.json
-└── tsconfig.json
-```
+React Native (Expo SDK 54) iOS app implementing OAuth 2.0 Authorization Code Flow with PKCE against Keycloak SSO, with backend API integration using JWT tokens.
 
 ## Commands
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start development server
-pnpm start
-
-# Run on iOS simulator
-pnpm ios
-
-# Run on Android emulator
-pnpm android
-
-# TypeScript type check
-pnpm typecheck
+pnpm install          # Install dependencies
+pnpm start            # Start Expo dev server
+pnpm ios              # Run on iOS simulator
+pnpm android          # Run on Android emulator
+pnpm typecheck        # TypeScript type check (tsc --noEmit)
+pnpm lint             # ESLint for .ts/.tsx files
 ```
+
+## Architecture
+
+**Routing**: File-based routing via expo-router v6. Pages live in `app/`, with `_layout.tsx` as root layout wrapping everything in `AuthProvider`.
+
+**Auth flow** (`src/context/AuthContext.tsx`): Central auth state management via React Context. Handles the full PKCE OAuth lifecycle — login opens system browser via `expo-auth-session`, exchanges auth code for tokens, stores them in iOS Keychain via `expo-secure-store`, auto-refreshes on a 60s interval (triggers when < 2min until expiry), and checks token validity on app foreground via AppState listener. Each token field is stored as a separate Keychain item to avoid the 2KB item limit.
+
+**Navigation guards**: Both `app/index.tsx` and `app/home.tsx` act as guards — index redirects to `/home` if authenticated, home redirects to `/` if not. The actual UI lives in `src/screens/`.
+
+**API client** (`src/services/api.ts`): Provides `authenticatedFetch<T>()` generic wrapper and `fetchUserProfile()` convenience function. All responses use the `ApiResponse<T>` envelope (`{ _status, data?, error? }`). Bearer token passed via Authorization header.
+
+**Path alias**: `@/*` maps to `src/*` (configured in tsconfig.json).
 
 ## Configuration
 
-Environment variables are in `app.json` under `expo.extra`:
+Environment variables are in `app.json` under `expo.extra` (not `.env` files):
+- `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID` — Keycloak OIDC settings
+- `BACKEND_API_URL` — Backend API base URL
 
-```json
-{
-  "KEYCLOAK_URL": "http://localhost:8080",
-  "KEYCLOAK_REALM": "mpc",
-  "KEYCLOAK_CLIENT_ID": "mpc-mobile",
-  "BACKEND_API_URL": "http://localhost:14444"
-}
-```
+OAuth redirect URLs (must match Keycloak client config):
+- Callback: `com.mpcmobile.auth://callback`
+- Logout: `com.mpcmobile.auth://logout`
 
-### OAuth Redirect URLs
+Custom URL scheme `com.mpcmobile.auth` is registered in `app.json` under `expo.scheme`.
 
-- **Callback**: `com.mpcmobile.auth://callback`
-- **Logout**: `com.mpcmobile.auth://logout`
+## Key Patterns
 
-These must be configured in Keycloak client settings.
-
-## Key Implementation Details
-
-### Authentication Flow
-
-1. User taps "Sign In" → Opens system browser via `expo-auth-session`
-2. User authenticates with Keycloak
-3. Keycloak redirects back via custom URL scheme
-4. App exchanges auth code for tokens (PKCE verified)
-5. Tokens stored in iOS Keychain via `expo-secure-store`
-6. Access token used for API calls
-
-### Token Management
-
-- **Auto-refresh**: Tokens refresh automatically before expiration (60s interval)
-- **AppState handling**: Token validity checked when app returns to foreground
-- **Secure storage**: Never stored in AsyncStorage, only Keychain
-
-### Navigation Guard Pattern
-
-Routes are protected in `app/home.tsx` - if not authenticated, redirects to sign-in.
-
-## API Endpoints
-
-Backend API base URL configured in `app.json`. Main endpoint:
-
-- `GET /api/v1/users/me` - Fetch authenticated user profile
-
-## Keycloak Client Requirements
-
-```
-Client Type: OpenID Connect
-Client Authentication: Off (public client)
-Standard Flow: Enabled
-PKCE Code Challenge Method: S256
-Valid Redirect URIs: com.mpcmobile.auth://callback
-Valid Post Logout Redirect URIs: com.mpcmobile.auth://logout
-```
-
-## Development Notes
-
-- Uses Expo's managed workflow
-- iOS App Transport Security allows HTTP for local development (disable in production)
-- The `scheme` in app.json registers the custom URL scheme for OAuth callbacks
+- **Strict TypeScript**: All types in `src/types/index.ts`. Strict mode enabled.
+- **Token storage keys**: `auth_access_token`, `auth_refresh_token`, `auth_access_token_expiry`, `auth_refresh_token_expiry` (stored individually in Keychain).
+- **OAuth scopes**: `openid`, `profile`, `email`, `offline_access`.
+- **Keycloak endpoints**: Built dynamically from realm URL in `src/config/auth.ts` via `getDiscoveryDocument()`.
+- **No test framework configured** — no test files or Jest config exist yet.
+- **New Architecture enabled** in app.json.
