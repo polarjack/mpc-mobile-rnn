@@ -1,4 +1,4 @@
-import type { VaultRole } from '../types';
+import type { VaultRole, Network } from '../types';
 
 const ROLE_HIERARCHY: Record<VaultRole, number> = {
   OWNER: 4,
@@ -26,5 +26,17 @@ export const getRoleColor = (role: VaultRole): string => {
       return '#4caf50';
     case 'VIEWER':
       return '#9e9e9e';
+  }
+};
+
+export const canManageWallets = (role: VaultRole): boolean =>
+  role === 'OWNER' || role === 'ADMIN';
+
+export const getNetworkColor = (network: Network): string => {
+  switch (network) {
+    case 'BITCOIN':
+      return '#f7931a';
+    case 'SOLANA':
+      return '#9945ff';
   }
 };

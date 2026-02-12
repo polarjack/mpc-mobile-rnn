@@ -138,6 +138,17 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
             <Text style={styles.navButtonText}>Members</Text>
           </Pressable>
 
+          <Pressable
+            style={({ pressed }) => [
+              styles.navButton,
+              styles.walletsButton,
+              pressed && { opacity: 0.7 },
+            ]}
+            onPress={() => router.push(`/vaults/${vaultId}/wallets`)}
+          >
+            <Text style={styles.navButtonText}>Wallets</Text>
+          </Pressable>
+
           {showSettings && (
             <Pressable
               style={({ pressed }) => [
@@ -291,6 +302,9 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     backgroundColor: '#1976d2',
+  },
+  walletsButton: {
+    backgroundColor: '#7b1fa2',
   },
   settingsButton: {
     backgroundColor: '#ff9800',

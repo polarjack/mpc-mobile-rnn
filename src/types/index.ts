@@ -144,6 +144,86 @@ export interface FetchVaultMembersParams {
   search?: string;
 }
 
+// ─── Wallet Types ───
+
+export type Network = 'BITCOIN' | 'SOLANA';
+
+export interface DisplayedAddress {
+  address: string;
+  addressType: string;
+}
+
+export interface ConvertedValue {
+  amount: string;
+  currencyCode: string;
+}
+
+export interface Wallet {
+  id: string;
+  vaultId: string;
+  name: string;
+  networks: Network[];
+  convertedValue: ConvertedValue;
+  addresses: DisplayedAddress[];
+  balancedAssets: string[];
+  accountIndex: number;
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WalletAddress {
+  id: string;
+  network: Network;
+  address: DisplayedAddress;
+  derivationPath: string;
+}
+
+export interface WalletBalance {
+  assetId: string;
+  rawValue: string;
+  amount: string;
+  convertedValue: ConvertedValue;
+  walletId: string;
+  walletName: string;
+  lockedAmount?: string;
+  lockedConvertedValue?: ConvertedValue;
+}
+
+export interface WalletPagination {
+  page: number;
+  limit: number;
+  totalPage: number;
+  totalCount: number;
+}
+
+export interface WalletsData {
+  wallets: Wallet[];
+  pagination: WalletPagination;
+}
+
+export interface CreateWalletRequest {
+  name: string;
+  networks: Network[];
+}
+
+export interface UpdateWalletRequest {
+  name: string;
+}
+
+export interface CreateWalletAddressRequest {
+  networks: Network[];
+}
+
+export interface FetchWalletsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  network?: Network;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 // JWT token parts
 export interface JWTHeader {
   alg: string;

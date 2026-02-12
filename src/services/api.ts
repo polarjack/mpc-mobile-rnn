@@ -12,6 +12,13 @@ import type {
   UpdateVaultMemberRoleRequest,
   UpdateVaultMemberRoleResponse,
   DeleteVaultMemberResponse,
+  Wallet,
+  WalletAddress,
+  WalletBalance,
+  FetchWalletsParams,
+  CreateWalletRequest,
+  UpdateWalletRequest,
+  CreateWalletAddressRequest,
 } from '../types';
 
 const API_BASE_URL = authConfig.backendApiUrl;
@@ -140,4 +147,98 @@ export const deleteVaultMember = (
     `/api/v1/vaults/${vaultId}/users/${userId}`,
     accessToken,
     { method: 'DELETE' },
+  );
+
+// ─── Wallet API ───
+
+export const fetchWallets = (
+  accessToken: string,
+  vaultId: string,
+  params?: FetchWalletsParams,
+): Promise<ApiResponse<Wallet[]>> => {
+  const searchParams = new URLSearchParams();
+  if (params?.page !== undefined) searchParams.set('page', params.page.toString());
+  if (params?.limit !== undefined) searchParams.set('limit', params.limit.toString());
+  if (params?.search) searchParams.set('search', params.search);
+  if (params?.network) searchParams.set('network', params.network);
+  if (params?.sortBy) searchParams.set('sortBy', params.sortBy);
+  if (params?.sortOrder) searchParams.set('sortOrder', params.sortOrder);
+  const query = searchParams.toString();
+  const endpoint = `/api/v1/vaults/${vaultId}/wallets${query ? `?${query}` : ''}`;
+  return authenticatedFetch<Wallet[]>(endpoint, accessToken);
+};
+
+export const createWallet = (
+  accessToken: string,
+  vaultId: string,
+  data: CreateWalletRequest,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(`/api/v1/vaults/${vaultId}/wallets`, accessToken, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const renameWallet = (
+  accessToken: string,
+  vaultId: string,
+  walletId: string,
+  data: UpdateWalletRequest,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(`/api/v1/vaults/${vaultId}/wallets/${walletId}`, accessToken, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+
+export const archiveWallet = (
+  accessToken: string,
+  vaultId: string,
+  walletId: string,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(
+    `/api/v1/vaults/${vaultId}/wallets/${walletId}/archive`,
+    accessToken,
+    { method: 'POST' },
+  );
+
+export const unarchiveWallet = (
+  accessToken: string,
+  vaultId: string,
+  walletId: string,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(
+    `/api/v1/vaults/${vaultId}/wallets/${walletId}/unarchive`,
+    accessToken,
+    { method: 'POST' },
+  );
+
+export const fetchWalletAddresses = (
+  accessToken: string,
+  vaultId: string,
+  walletId: string,
+): Promise<ApiResponse<WalletAddress[]>> =>
+  authenticatedFetch<WalletAddress[]>(
+    `/api/v1/vaults/${vaultId}/wallets/${walletId}/addresses`,
+    accessToken,
+  );
+
+export const addWalletAddress = (
+  accessToken: string,
+  vaultId: string,
+  walletId: string,
+  data: CreateWalletAddressRequest,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(
+    `/api/v1/vaults/${vaultId}/wallets/${walletId}/addresses`,
+    accessToken,
+    { method: 'POST', body: JSON.stringify(data) },
+  );
+
+export const fetchWalletBalances = (
+  accessToken: string,
+  vaultId: string,
+  walletId: string,
+): Promise<ApiResponse<WalletBalance[]>> =>
+  authenticatedFetch<WalletBalance[]>(
+    `/api/v1/vaults/${vaultId}/wallets/${walletId}/balances`,
+    accessToken,
   );
