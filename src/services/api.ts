@@ -19,6 +19,10 @@ import type {
   CreateWalletRequest,
   UpdateWalletRequest,
   CreateWalletAddressRequest,
+  AuditLogListItem,
+  AuditLogsResponse,
+  AuditLogDetail,
+  FetchAuditLogsParams,
 } from '../types';
 
 const API_BASE_URL = authConfig.backendApiUrl;
@@ -240,5 +244,42 @@ export const fetchWalletBalances = (
 ): Promise<ApiResponse<WalletBalance[]>> =>
   authenticatedFetch<WalletBalance[]>(
     `/api/v1/vaults/${vaultId}/wallets/${walletId}/balances`,
+    accessToken,
+  );
+
+// ─── Audit Log API ───
+
+export const fetchAuditLogs = (
+  accessToken: string,
+  vaultId: string,
+  params?: FetchAuditLogsParams,
+): Promise<AuditLogsResponse> => {
+  const searchParams = new URLSearchParams();
+  if (params?.page !== undefined) searchParams.set('page', params.page.toString());
+  if (params?.limit !== undefined) searchParams.set('limit', params.limit.toString());
+  if (params?.search) searchParams.set('search', params.search);
+  if (params?.startTime) searchParams.set('startTime', params.startTime);
+  if (params?.endTime) searchParams.set('endTime', params.endTime);
+  if (params?.sortOrder) searchParams.set('sortOrder', params.sortOrder);
+  if (params?.actorIds) {
+    for (const id of params.actorIds) searchParams.append('actorIds', id);
+  }
+  if (params?.eventTypes) {
+    for (const et of params.eventTypes) searchParams.append('eventTypes', et);
+  }
+  const query = searchParams.toString();
+  return authenticatedFetch<AuditLogListItem[]>(
+    `/api/v1/vaults/${vaultId}/audit-logs${query ? `?${query}` : ''}`,
+    accessToken,
+  ) as Promise<AuditLogsResponse>;
+};
+
+export const fetchAuditLogDetail = (
+  accessToken: string,
+  vaultId: string,
+  logId: string,
+): Promise<ApiResponse<AuditLogDetail>> =>
+  authenticatedFetch<AuditLogDetail>(
+    `/api/v1/vaults/${vaultId}/audit-logs/${logId}`,
     accessToken,
   );

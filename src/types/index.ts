@@ -224,6 +224,61 @@ export interface FetchWalletsParams {
   sortOrder?: 'asc' | 'desc';
 }
 
+// ─── Audit Log Types ───
+
+export type AuditEventType =
+  | 'INITIATE_TRANSACTION' | 'SIGN_TRANSACTION' | 'APPROVE_TRANSACTION'
+  | 'REJECT_TRANSACTION' | 'CANCEL_TRANSACTION' | 'UPDATE_TRANSACTION_NOTE'
+  | 'INITIATE_VAULT_ACTION' | 'SIGN_VAULT_ACTION' | 'APPROVE_VAULT_ACTION'
+  | 'REJECT_VAULT_ACTION' | 'CANCEL_VAULT_ACTION'
+  | 'CHANGE_ADMIN_QUORUM_SIZE' | 'CREATE_WALLET' | 'UPDATE_VAULT_INFO' | 'UNKNOWN';
+
+export type SortOrder = 'ASC' | 'DESC';
+
+export type ActorInfo =
+  | { type: 'USER'; parameters: { id: string; name: string; email: string } }
+  | { type: 'SERVICE_ACCOUNT'; parameters: { id: string; name: string } };
+
+export interface AuditLogListItem {
+  id: string;
+  createdAt: string;
+  actor: ActorInfo;
+  eventType: AuditEventType;
+  payload: Record<string, unknown>;
+}
+
+export interface AuditLogDetail extends AuditLogListItem {
+  ipAddress: string;
+}
+
+export interface AuditLogPagination {
+  page: number;
+  limit: number;
+  totalPage: number;
+  totalCount: number;
+}
+
+export interface AuditLogsResponse {
+  _status: number;
+  data?: AuditLogListItem[];
+  pagination?: AuditLogPagination;
+  error?: {
+    type: string;
+    message: string;
+  };
+}
+
+export interface FetchAuditLogsParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  startTime?: string;
+  endTime?: string;
+  actorIds?: string[];
+  eventTypes?: AuditEventType[];
+  sortOrder?: SortOrder;
+}
+
 // JWT token parts
 export interface JWTHeader {
   alg: string;
