@@ -15,6 +15,20 @@ import { useAuth } from '../hooks/useAuth';
 import { useVault } from '../hooks/useVault';
 import { getRoleColor } from '../utils/permissions';
 import type { Vault, VaultRole } from '../types';
+import {
+  PRIMARY,
+  SUCCESS,
+  DANGER,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+  BG_MAIN,
+  BG_WHITE,
+  BG_LIGHT_GREEN,
+  BG_LIGHT_PINK,
+  SHADOW,
+} from '@/constants/colors';
 
 const keyExtractor = (item: Vault) => item.id;
 
@@ -39,13 +53,13 @@ const VaultCard = React.memo<VaultCardProps>(({ item, role, onPress }) => {
         <View
           style={[
             styles.statusBadge,
-            { backgroundColor: item.activated ? '#e8f5e9' : '#fce4ec' },
+            { backgroundColor: item.activated ? BG_LIGHT_GREEN : BG_LIGHT_PINK },
           ]}
         >
           <Text
             style={[
               styles.statusText,
-              { color: item.activated ? '#4caf50' : '#f44336' },
+              { color: item.activated ? SUCCESS : DANGER },
             ]}
           >
             {item.activated ? 'Active' : 'Inactive'}
@@ -103,7 +117,7 @@ export const VaultListScreen: React.FC = () => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -127,13 +141,13 @@ export const VaultListScreen: React.FC = () => {
         renderItem={renderVaultCard}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={vaultLoading} onRefresh={onRefresh} tintColor="#1976d2" />
+          <RefreshControl refreshing={vaultLoading} onRefresh={onRefresh} tintColor={PRIMARY} />
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No Vaults</Text>
             <Text style={styles.emptySubtitle}>
-              You don't have access to any vaults yet.
+              You don&apos;t have access to any vaults yet.
             </Text>
           </View>
         }
@@ -145,7 +159,7 @@ export const VaultListScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -162,16 +176,16 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   logoutButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#f44336',
+    backgroundColor: DANGER,
   },
   logoutButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontWeight: '600',
   },
   listContent: {
@@ -179,11 +193,11 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -198,7 +212,7 @@ const styles = StyleSheet.create({
   vaultName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flex: 1,
     marginRight: 8,
   },
@@ -224,7 +238,7 @@ const styles = StyleSheet.create({
   },
   vaultEmail: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   emptyState: {
     alignItems: 'center',
@@ -233,11 +247,11 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
 });

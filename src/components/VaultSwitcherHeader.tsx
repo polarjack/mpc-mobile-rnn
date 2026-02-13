@@ -13,6 +13,17 @@ import { useAuth } from '../hooks/useAuth';
 import { useVault } from '../hooks/useVault';
 import { getRoleColor } from '../utils/permissions';
 import type { Vault, VaultRole } from '../types';
+import {
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_WHITE,
+  DANGER,
+  BG_WHITE,
+  OVERLAY,
+  BG_LIGHT_BLUE,
+  PRIMARY,
+  BORDER_LIGHT,
+} from '@/constants/colors';
 
 const keyExtractor = (item: Vault) => item.id;
 
@@ -171,7 +182,7 @@ const styles = StyleSheet.create({
   vaultName: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flexShrink: 1,
     marginRight: 8,
   },
@@ -187,28 +198,28 @@ const styles = StyleSheet.create({
   },
   chevron: {
     fontSize: 16,
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginLeft: 2,
   },
   logoutButton: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#f44336',
+    backgroundColor: DANGER,
   },
   logoutText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontWeight: '600',
     fontSize: 13,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: OVERLAY,
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 16,
     width: '85%',
     maxHeight: '60%',
@@ -217,7 +228,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 16,
     textAlign: 'center',
   },
@@ -233,7 +244,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   vaultItemActive: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: BG_LIGHT_BLUE,
   },
   vaultItemContent: {
     flex: 1,
@@ -243,12 +254,12 @@ const styles = StyleSheet.create({
   vaultItemName: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flexShrink: 1,
     marginRight: 8,
   },
   vaultItemNameActive: {
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '600',
   },
   vaultItemRole: {
@@ -262,7 +273,7 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '700',
     marginLeft: 8,
   },
@@ -271,11 +282,11 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: BORDER_LIGHT,
   },
   modalCloseText: {
     fontSize: 16,
-    color: '#666',
+    color: TEXT_SECONDARY,
     fontWeight: '500',
   },
 });

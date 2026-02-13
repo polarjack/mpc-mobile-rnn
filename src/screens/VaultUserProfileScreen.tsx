@@ -13,6 +13,16 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import { fetchVaultUserProfile } from '../services/api';
 import { getRoleColor } from '../utils/permissions';
+import {
+  BG_MAIN,
+  BG_WHITE,
+  DIVIDER,
+  PRIMARY,
+  SHADOW,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+} from '@/constants/colors';
 import type { VaultUserData } from '../types';
 
 interface Props {
@@ -48,7 +58,7 @@ export const VaultUserProfileScreen: React.FC<Props> = ({ vaultId }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -152,16 +162,16 @@ const infoStyles = StyleSheet.create({
   },
   border: {
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DIVIDER,
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   value: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
     maxWidth: '60%',
     textAlign: 'right',
   },
@@ -170,7 +180,7 @@ const infoStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -194,13 +204,13 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   section: {
     marginBottom: 24,
@@ -208,14 +218,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -238,15 +248,15 @@ const styles = StyleSheet.create({
   },
   permBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DIVIDER,
   },
   permText: {
     fontSize: 14,
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   emptyText: {
     fontSize: 14,
-    color: '#999',
+    color: TEXT_TERTIARY,
     fontStyle: 'italic',
   },
 });

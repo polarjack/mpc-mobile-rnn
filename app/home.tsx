@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../src/hooks/useAuth';
+import { PRIMARY, BG_MAIN } from '../src/constants/colors';
 
 export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -19,7 +20,7 @@ export default function Home() {
 
   return (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#1976d2" />
+      <ActivityIndicator size="large" color={PRIMARY} />
     </View>
   );
 }
@@ -29,6 +30,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
 });

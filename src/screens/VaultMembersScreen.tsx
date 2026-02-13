@@ -21,6 +21,18 @@ import {
   deleteVaultMember,
 } from '../services/api';
 import { canManageMembers, canManageMember, getRoleColor } from '../utils/permissions';
+import {
+  BG_MAIN,
+  BG_WHITE,
+  PRIMARY,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+  SHADOW,
+  OVERLAY,
+  BORDER_MID,
+} from '@/constants/colors';
 import type { VaultMember, VaultRole, Pagination } from '../types';
 
 const ROLES: VaultRole[] = ['OWNER', 'ADMIN', 'SIGNER', 'VIEWER'];
@@ -246,7 +258,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -280,7 +292,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
           placeholder="Search members..."
           value={search}
           onChangeText={handleSearch}
-          placeholderTextColor="#999"
+          placeholderTextColor={TEXT_TERTIARY}
           autoCapitalize="none"
           autoCorrect={false}
         />
@@ -296,7 +308,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={
           loadingMore ? (
-            <ActivityIndicator style={styles.footerLoader} color="#1976d2" />
+            <ActivityIndicator style={styles.footerLoader} color={PRIMARY} />
           ) : null
         }
         ListEmptyComponent={
@@ -320,7 +332,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
-              placeholderTextColor="#999"
+              placeholderTextColor={TEXT_TERTIARY}
             />
 
             <Text style={styles.modalLabel}>Role</Text>
@@ -375,7 +387,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
                 disabled={addLoading || !addEmail.trim()}
               >
                 {addLoading ? (
-                  <ActivityIndicator color="#fff" size="small" />
+                  <ActivityIndicator color={TEXT_WHITE} size="small" />
                 ) : (
                   <Text style={styles.submitButtonText}>Add</Text>
                 )}
@@ -391,7 +403,7 @@ export const VaultMembersScreen: React.FC<Props> = ({ vaultId }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -409,23 +421,23 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flex: 1,
   },
   addButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
   },
   addButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontWeight: '600',
     fontSize: 14,
   },
@@ -434,13 +446,13 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   searchInput: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 15,
-    color: '#333',
-    shadowColor: '#000',
+    color: TEXT_PRIMARY,
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -451,13 +463,13 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   memberRow: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -470,11 +482,11 @@ const styles = StyleSheet.create({
   memberName: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   memberEmail: {
     fontSize: 13,
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginTop: 2,
   },
   roleBadge: {
@@ -495,38 +507,38 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: OVERLAY,
     justifyContent: 'center',
     padding: 24,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 16,
     padding: 24,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 16,
   },
   modalInput: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 16,
   },
   modalLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginBottom: 8,
   },
   rolePickerRow: {
@@ -540,12 +552,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: BORDER_MID,
   },
   roleOptionText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -558,19 +570,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   submitButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: TEXT_WHITE,
   },
 });

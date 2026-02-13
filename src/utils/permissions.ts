@@ -1,4 +1,5 @@
 import type { VaultRole, Network } from '../types';
+import { PRIMARY, WARNING, SUCCESS, GREY, BITCOIN, SOLANA } from '../constants/colors';
 
 const ROLE_HIERARCHY: Record<VaultRole, number> = {
   OWNER: 4,
@@ -19,13 +20,13 @@ export const canManageMember = (currentRole: VaultRole, targetRole: VaultRole): 
 export const getRoleColor = (role: VaultRole): string => {
   switch (role) {
     case 'OWNER':
-      return '#1976d2';
+      return PRIMARY;
     case 'ADMIN':
-      return '#ff9800';
+      return WARNING;
     case 'SIGNER':
-      return '#4caf50';
+      return SUCCESS;
     case 'VIEWER':
-      return '#9e9e9e';
+      return GREY;
   }
 };
 
@@ -35,8 +36,8 @@ export const canManageWallets = (role: VaultRole): boolean =>
 export const getNetworkColor = (network: Network): string => {
   switch (network) {
     case 'BITCOIN':
-      return '#f7931a';
+      return BITCOIN;
     case 'SOLANA':
-      return '#9945ff';
+      return SOLANA;
   }
 };

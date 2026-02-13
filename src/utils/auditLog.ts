@@ -1,4 +1,5 @@
 import type { AuditEventType, ActorInfo } from '../types';
+import { SUCCESS, DANGER, PURPLE, PRIMARY, WARNING, GREY } from '../constants/colors';
 
 export const AUDIT_EVENT_LABELS: Record<AuditEventType, string> = {
   INITIATE_TRANSACTION: 'Initiate Transaction',
@@ -24,23 +25,23 @@ export const getEventTypeColor = (eventType: AuditEventType): string => {
     case 'APPROVE_TRANSACTION':
     case 'INITIATE_VAULT_ACTION':
     case 'APPROVE_VAULT_ACTION':
-      return '#4caf50'; // green - positive actions
+      return SUCCESS; // green - positive actions
     case 'REJECT_TRANSACTION':
     case 'CANCEL_TRANSACTION':
     case 'REJECT_VAULT_ACTION':
     case 'CANCEL_VAULT_ACTION':
-      return '#f44336'; // red - negative actions
+      return DANGER; // red - negative actions
     case 'SIGN_TRANSACTION':
     case 'SIGN_VAULT_ACTION':
-      return '#7b1fa2'; // purple - signing actions
+      return PURPLE; // purple - signing actions
     case 'CREATE_WALLET':
     case 'UPDATE_TRANSACTION_NOTE':
-      return '#1976d2'; // blue - neutral actions
+      return PRIMARY; // blue - neutral actions
     case 'CHANGE_ADMIN_QUORUM_SIZE':
     case 'UPDATE_VAULT_INFO':
-      return '#ff9800'; // orange - config changes
+      return WARNING; // orange - config changes
     default:
-      return '#9e9e9e'; // grey - unknown
+      return GREY; // grey - unknown
   }
 };
 

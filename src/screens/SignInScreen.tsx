@@ -8,6 +8,15 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/useAuth';
+import {
+  BG_MAIN,
+  PRIMARY,
+  SHADOW,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+} from '@/constants/colors';
 
 export const SignInScreen: React.FC = () => {
   const { login, isLoading } = useAuth();
@@ -38,7 +47,7 @@ export const SignInScreen: React.FC = () => {
             disabled={isLoading}
           >
             {isLoading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={TEXT_WHITE} />
             ) : (
               <Text style={styles.buttonText}>Sign In with SSO</Text>
             )}
@@ -58,7 +67,7 @@ export const SignInScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   content: {
     flex: 1,
@@ -73,11 +82,11 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 20,
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -86,34 +95,34 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#fff',
+    color: TEXT_WHITE,
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   formContainer: {
     paddingHorizontal: 16,
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 20,
   },
   button: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
     paddingVertical: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#1976d2',
+    shadowColor: PRIMARY,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -123,7 +132,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontSize: 18,
     fontWeight: '600',
   },
@@ -133,6 +142,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
 });

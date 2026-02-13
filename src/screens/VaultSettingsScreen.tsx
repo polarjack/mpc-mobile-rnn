@@ -14,6 +14,15 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import { fetchVault, updateVault } from '../services/api';
 import type { Vault } from '../types';
+import {
+  BG_MAIN,
+  BG_WHITE,
+  PRIMARY,
+  SHADOW,
+  TEXT_PRIMARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+} from '@/constants/colors';
 
 interface Props {
   vaultId: string;
@@ -91,7 +100,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -119,7 +128,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
             value={name}
             onChangeText={setName}
             placeholder="Vault name"
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
           />
 
           <Text style={styles.label}>Business Email *</Text>
@@ -130,7 +139,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
             placeholder="email@example.com"
             keyboardType="email-address"
             autoCapitalize="none"
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
           />
 
           <Text style={styles.label}>Phone *</Text>
@@ -140,7 +149,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
             onChangeText={setPhone}
             placeholder="+1 234 567 8900"
             keyboardType="phone-pad"
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
           />
 
           <Text style={styles.label}>Website URL</Text>
@@ -151,7 +160,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
             placeholder="https://example.com"
             keyboardType="url"
             autoCapitalize="none"
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
           />
 
           <Pressable
@@ -164,7 +173,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
             disabled={saving}
           >
             {saving ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={TEXT_WHITE} size="small" />
             ) : (
               <Text style={styles.saveButtonText}>Save Changes</Text>
             )}
@@ -178,7 +187,7 @@ export const VaultSettingsScreen: React.FC<Props> = ({ vaultId }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -202,19 +211,19 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -223,20 +232,20 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 6,
     marginTop: 12,
   },
   input: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   saveButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
     paddingVertical: 14,
     borderRadius: 10,
     alignItems: 'center',
@@ -246,7 +255,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   saveButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontSize: 16,
     fontWeight: '600',
   },

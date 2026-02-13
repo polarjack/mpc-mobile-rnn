@@ -7,6 +7,19 @@ import {
   ScrollView,
 } from 'react-native';
 import type { DecodedJWT, JWTHeader, JWTPayload } from '../types';
+import {
+  BG_WHITE,
+  BORDER,
+  BG_MAIN,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  BG_SUBTLE,
+  PRIMARY,
+  BG_DARK,
+  TEXT_CODE,
+  DANGER,
+} from '@/constants/colors';
 
 interface TokenDisplayProps {
   token: string | null;
@@ -161,65 +174,65 @@ export const TokenDisplay: React.FC<TokenDisplayProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 8,
     marginVertical: 8,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: BORDER,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   title: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   expandIcon: {
     fontSize: 12,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   noToken: {
     padding: 12,
-    color: '#999',
+    color: TEXT_TERTIARY,
     fontStyle: 'italic',
   },
   content: {
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: BORDER,
   },
   tabs: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: BORDER,
   },
   tab: {
     flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
-    backgroundColor: '#fafafa',
+    backgroundColor: BG_SUBTLE,
   },
   activeTab: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderBottomWidth: 2,
-    borderBottomColor: '#1976d2',
+    borderBottomColor: PRIMARY,
   },
   tabText: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   activeTabText: {
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '600',
   },
   contentBody: {
     maxHeight: 200,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: BG_DARK,
   },
   scrollContent: {
     padding: 12,
@@ -227,17 +240,17 @@ const styles = StyleSheet.create({
   jsonText: {
     fontFamily: 'monospace',
     fontSize: 12,
-    color: '#d4d4d4',
+    color: TEXT_CODE,
     lineHeight: 18,
   },
   rawText: {
     fontFamily: 'monospace',
     fontSize: 10,
-    color: '#d4d4d4',
+    color: TEXT_CODE,
     lineHeight: 14,
   },
   errorText: {
     padding: 12,
-    color: '#f44336',
+    color: DANGER,
   },
 });

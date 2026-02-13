@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../src/hooks/useAuth';
 import { useVault } from '../src/hooks/useVault';
 import { SignInScreen } from '../src/screens/SignInScreen';
+import { PRIMARY, BG_MAIN } from '../src/constants/colors';
 
 export default function Index() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
@@ -24,7 +25,7 @@ export default function Index() {
   if (authLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
@@ -35,7 +36,7 @@ export default function Index() {
 
   return (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator size="large" color="#1976d2" />
+      <ActivityIndicator size="large" color={PRIMARY} />
     </View>
   );
 }
@@ -45,6 +46,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
 });

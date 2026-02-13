@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
+import { BG_MAIN, TEXT_SECONDARY, COUNTDOWN_GREEN, COUNTDOWN_ORANGE, COUNTDOWN_RED } from '@/constants/colors';
+
 interface CountdownTimerProps {
   label: string;
   expiresAt: Date | null;
@@ -74,25 +76,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     paddingHorizontal: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     borderRadius: 8,
     marginVertical: 4,
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
     fontWeight: '500',
   },
   timer: {
     fontSize: 16,
     fontFamily: 'monospace',
     fontWeight: 'bold',
-    color: '#2e7d32',
+    color: COUNTDOWN_GREEN,
   },
   warning: {
-    color: '#f57c00',
+    color: COUNTDOWN_ORANGE,
   },
   expired: {
-    color: '#d32f2f',
+    color: COUNTDOWN_RED,
   },
 });

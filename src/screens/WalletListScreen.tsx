@@ -14,6 +14,18 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import {
+  PRIMARY,
+  WARNING,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+  BG_MAIN,
+  BG_WHITE,
+  BG_LIGHT_ORANGE,
+  BORDER_MID,
+} from '@/constants/colors';
+import {
   fetchWallets,
   fetchVaultUserProfile,
   createWallet,
@@ -311,7 +323,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: rol
     return (
       <Wrapper style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </Wrapper>
     );
@@ -348,7 +360,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: rol
             placeholder="Search wallets..."
             value={search}
             onChangeText={handleSearch}
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
             autoCapitalize="none"
             autoCorrect={false}
           />
@@ -373,7 +385,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: rol
         onEndReachedThreshold={0.5}
         ListFooterComponent={
           loadingMore ? (
-            <ActivityIndicator style={styles.footerLoader} color="#1976d2" />
+            <ActivityIndicator style={styles.footerLoader} color={PRIMARY} />
           ) : null
         }
         ListEmptyComponent={
@@ -400,7 +412,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: rol
             onChangeText={setCreateName}
             autoCapitalize="words"
             autoCorrect={false}
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
           />
 
           <Text style={styles.modalLabel}>Networks</Text>
@@ -458,7 +470,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: rol
               disabled={createLoading || !createName.trim() || createNetworks.length === 0}
             >
               {createLoading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={TEXT_WHITE} size="small" />
               ) : (
                 <Text style={styles.submitButtonText}>Create</Text>
               )}
@@ -473,7 +485,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: rol
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -491,23 +503,23 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flex: 1,
   },
   createButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
   },
   createButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontWeight: '600',
     fontSize: 14,
   },
@@ -524,13 +536,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   searchInput: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 10,
     borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 15,
-    color: '#333',
+    color: TEXT_PRIMARY,
     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
   },
   listContent: {
@@ -538,7 +550,7 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   walletCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     borderCurve: 'continuous',
     padding: 14,
@@ -554,15 +566,15 @@ const styles = StyleSheet.create({
   walletName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flex: 1,
     marginRight: 8,
   },
   archivedBadge: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#ff9800',
-    backgroundColor: '#fff3e0',
+    color: WARNING,
+    backgroundColor: BG_LIGHT_ORANGE,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
@@ -584,7 +596,7 @@ const styles = StyleSheet.create({
   walletValue: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   footerLoader: {
     paddingVertical: 16,
@@ -595,34 +607,34 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   modalContainer: {
     flex: 1,
     padding: 24,
     paddingTop: 32,
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 24,
   },
   modalInput: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     borderRadius: 10,
     borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 16,
   },
   modalLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginBottom: 8,
   },
   networkPickerRow: {
@@ -635,12 +647,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: BORDER_MID,
   },
   networkOptionText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -654,19 +666,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   submitButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
   },
   submitButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: TEXT_WHITE,
   },
 });

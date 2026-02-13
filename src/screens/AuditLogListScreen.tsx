@@ -16,6 +16,20 @@ import { useRouter } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import { fetchAuditLogs } from '../services/api';
 import {
+  PRIMARY,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+  BG_MAIN,
+  BG_WHITE,
+  BLUE_GREY,
+  SHADOW,
+  OVERLAY,
+  BORDER_MID,
+  DANGER,
+} from '@/constants/colors';
+import {
   AUDIT_EVENT_LABELS,
   getEventTypeColor,
   getActorDisplayName,
@@ -125,7 +139,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
   useEffect(() => {
     setLoading(true);
     loadLogs(1, search, filters, false).then(() => setLoading(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [loadLogs]);
 
   const handleSearch = (text: string) => {
@@ -191,7 +205,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -225,7 +239,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
           placeholder="Search audit logs..."
           value={search}
           onChangeText={handleSearch}
-          placeholderTextColor="#999"
+          placeholderTextColor={TEXT_TERTIARY}
           autoCapitalize="none"
           autoCorrect={false}
         />
@@ -243,7 +257,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
         refreshing={refreshing}
         ListFooterComponent={
           loadingMore ? (
-            <ActivityIndicator style={styles.footerLoader} color="#1976d2" />
+            <ActivityIndicator style={styles.footerLoader} color={PRIMARY} />
           ) : null
         }
         ListEmptyComponent={
@@ -308,7 +322,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
                 onChangeText={(text) =>
                   setDraftFilters((prev) => ({ ...prev, startTime: text }))
                 }
-                placeholderTextColor="#999"
+                placeholderTextColor={TEXT_TERTIARY}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -321,7 +335,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
                 onChangeText={(text) =>
                   setDraftFilters((prev) => ({ ...prev, endTime: text }))
                 }
-                placeholderTextColor="#999"
+                placeholderTextColor={TEXT_TERTIARY}
                 autoCapitalize="none"
                 autoCorrect={false}
               />
@@ -397,7 +411,7 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -415,23 +429,23 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '500',
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flex: 1,
   },
   filterButton: {
-    backgroundColor: '#607d8b',
+    backgroundColor: BLUE_GREY,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
   },
   filterButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontWeight: '600',
     fontSize: 14,
   },
@@ -440,13 +454,13 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   searchInput: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 10,
     fontSize: 15,
-    color: '#333',
-    shadowColor: '#000',
+    color: TEXT_PRIMARY,
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -457,13 +471,13 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   logRow: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 14,
     marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 2,
@@ -482,16 +496,16 @@ const styles = StyleSheet.create({
   eventLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   actorName: {
     fontSize: 13,
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginTop: 2,
   },
   timestamp: {
     fontSize: 12,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   footerLoader: {
     paddingVertical: 16,
@@ -502,16 +516,16 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: OVERLAY,
     justifyContent: 'center',
     padding: 24,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 16,
     padding: 24,
     maxHeight: '80%',
@@ -519,23 +533,23 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 16,
   },
   modalLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginBottom: 8,
     marginTop: 4,
   },
   modalInput: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 12,
   },
   sortRow: {
@@ -548,20 +562,20 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: BORDER_MID,
     alignItems: 'center',
   },
   sortOptionActive: {
-    backgroundColor: '#1976d2' + '20',
-    borderColor: '#1976d2',
+    backgroundColor: PRIMARY + '20',
+    borderColor: PRIMARY,
   },
   sortOptionText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   sortOptionTextActive: {
-    color: '#1976d2',
+    color: PRIMARY,
   },
   chipRow: {
     flexDirection: 'row',
@@ -574,12 +588,12 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: BORDER_MID,
   },
   chipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -593,29 +607,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clearButton: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BORDER_MID,
   },
   clearButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#f44336',
+    color: DANGER,
   },
   cancelButton: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   cancelButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   applyButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
   },
   applyButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#fff',
+    color: TEXT_WHITE,
   },
 });

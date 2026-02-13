@@ -3,6 +3,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../src/hooks/useAuth';
 import { VaultListScreen } from '../../src/screens/VaultListScreen';
+import { PRIMARY, BG_MAIN } from '../../src/constants/colors';
 
 export default function VaultsIndex() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -17,7 +18,7 @@ export default function VaultsIndex() {
   if (isLoading || !isAuthenticated) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1976d2" />
+        <ActivityIndicator size="large" color={PRIMARY} />
       </View>
     );
   }
@@ -30,6 +31,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
 });

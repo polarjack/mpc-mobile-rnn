@@ -10,6 +10,21 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '../hooks/useAuth';
+import {
+  BG_MAIN,
+  BG_WHITE,
+  BG_DARK,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_WHITE,
+  TEXT_CODE,
+  DANGER,
+  WARNING,
+  SUCCESS,
+  SHADOW,
+  BORDER,
+  DIVIDER,
+} from '@/constants/colors';
 import { CountdownTimer } from '../components/CountdownTimer';
 import { TokenDisplay } from '../components/TokenDisplay';
 import { fetchUserProfile } from '../services/api';
@@ -36,7 +51,7 @@ export const HomeScreen: React.FC = () => {
     try {
       await refreshAccessToken();
       Alert.alert('Success', 'Token refreshed successfully');
-    } catch (error) {
+    } catch {
       Alert.alert('Error', 'Failed to refresh token');
     } finally {
       setIsRefreshing(false);
@@ -140,7 +155,7 @@ export const HomeScreen: React.FC = () => {
               disabled={isRefreshing}
             >
               {isRefreshing ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={TEXT_WHITE} size="small" />
               ) : (
                 <Text style={styles.actionButtonText}>Refresh Token</Text>
               )}
@@ -156,7 +171,7 @@ export const HomeScreen: React.FC = () => {
               disabled={isLoadingApi}
             >
               {isLoadingApi ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={TEXT_WHITE} size="small" />
               ) : (
                 <Text style={styles.actionButtonText}>Backend API</Text>
               )}
@@ -198,7 +213,7 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   scrollView: {
     flex: 1,
@@ -216,16 +231,16 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   logoutButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#f44336',
+    backgroundColor: DANGER,
   },
   logoutButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontWeight: '600',
   },
   section: {
@@ -234,14 +249,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 12,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -252,16 +267,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DIVIDER,
   },
   infoLabel: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   infoValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
     maxWidth: '60%',
     textAlign: 'right',
   },
@@ -276,13 +291,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   refreshButton: {
-    backgroundColor: '#ff9800',
+    backgroundColor: WARNING,
   },
   apiButton: {
-    backgroundColor: '#4caf50',
+    backgroundColor: SUCCESS,
   },
   actionButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -292,31 +307,31 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   successCard: {
-    borderColor: '#4caf50',
+    borderColor: SUCCESS,
   },
   errorCard: {
-    borderColor: '#f44336',
+    borderColor: DANGER,
   },
   responseHeader: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     padding: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: BORDER,
   },
   responseStatus: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   responseBody: {
     maxHeight: 200,
-    backgroundColor: '#1e1e1e',
+    backgroundColor: BG_DARK,
     padding: 12,
   },
   responseText: {
     fontFamily: 'monospace',
     fontSize: 12,
-    color: '#d4d4d4',
+    color: TEXT_CODE,
     lineHeight: 18,
   },
 });

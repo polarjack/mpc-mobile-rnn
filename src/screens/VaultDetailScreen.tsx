@@ -17,6 +17,26 @@ import { fetchVault, fetchVaultUserProfile } from '../services/api';
 import { canManageMembers } from '../utils/permissions';
 import { VaultSwitcherHeader } from '../components/VaultSwitcherHeader';
 import { WalletListScreen } from './WalletListScreen';
+import {
+  PRIMARY,
+  SUCCESS,
+  DANGER,
+  WARNING,
+  BLUE_GREY,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+  BG_MAIN,
+  BG_WHITE,
+  BG_LIGHT_BLUE,
+  BG_LIGHT_GREEN,
+  BG_LIGHT_PINK,
+  BORDER,
+  DIVIDER,
+  SHADOW,
+  TRANSPARENT,
+} from '@/constants/colors';
 import type { Vault, VaultUserData, VaultRole } from '../types';
 
 type TabKey = 'wallets' | 'settings';
@@ -75,7 +95,7 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -169,7 +189,7 @@ const VaultOverviewContent: React.FC<VaultOverviewProps> = ({
     style={styles.scrollView}
     contentContainerStyle={styles.scrollContent}
     refreshControl={
-      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1976d2" />
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />
     }
   >
     {/* Vault Info */}
@@ -179,13 +199,13 @@ const VaultOverviewContent: React.FC<VaultOverviewProps> = ({
           <View
             style={[
               styles.statusBadge,
-              { backgroundColor: vault.activated ? '#e8f5e9' : '#fce4ec' },
+              { backgroundColor: vault.activated ? BG_LIGHT_GREEN : BG_LIGHT_PINK },
             ]}
           >
             <Text
               style={[
                 styles.statusText,
-                { color: vault.activated ? '#4caf50' : '#f44336' },
+                { color: vault.activated ? SUCCESS : DANGER },
               ]}
             >
               {vault.activated ? 'Active' : 'Inactive'}
@@ -285,16 +305,16 @@ const infoStyles = StyleSheet.create({
   },
   border: {
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DIVIDER,
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   value: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
     maxWidth: '60%',
     textAlign: 'right',
   },
@@ -303,7 +323,7 @@ const infoStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -345,18 +365,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: '#e3f2fd',
+    backgroundColor: BG_LIGHT_BLUE,
   },
   roleText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#1976d2',
+    color: PRIMARY,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     padding: 16,
-    shadowColor: '#000',
+    shadowColor: SHADOW,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -365,7 +385,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 12,
   },
   navButton: {
@@ -375,28 +395,28 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   primaryButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
   },
   auditLogsButton: {
-    backgroundColor: '#607d8b',
+    backgroundColor: BLUE_GREY,
   },
   settingsButton: {
-    backgroundColor: '#ff9800',
+    backgroundColor: WARNING,
   },
   profileButton: {
-    backgroundColor: '#4caf50',
+    backgroundColor: SUCCESS,
   },
   navButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontSize: 16,
     fontWeight: '600',
   },
   // Bottom Tab Bar
   tabBar: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: BORDER,
     paddingBottom: 20,
   },
   tabButton: {
@@ -404,17 +424,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderTopWidth: 2,
-    borderTopColor: 'transparent',
+    borderTopColor: TRANSPARENT,
   },
   tabButtonActive: {
-    borderTopColor: '#1976d2',
+    borderTopColor: PRIMARY,
   },
   tabButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   tabButtonTextActive: {
-    color: '#1976d2',
+    color: PRIMARY,
   },
 });

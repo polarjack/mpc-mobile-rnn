@@ -14,6 +14,20 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import {
+  BG_MAIN,
+  BG_WHITE,
+  BG_LIGHT_ORANGE,
+  BORDER_MID,
+  DIVIDER,
+  PRIMARY,
+  SUCCESS,
+  WARNING,
+  TEXT_PRIMARY,
+  TEXT_SECONDARY,
+  TEXT_TERTIARY,
+  TEXT_WHITE,
+} from '@/constants/colors';
+import {
   fetchWallets,
   fetchVaultUserProfile,
   fetchWalletAddresses,
@@ -186,7 +200,7 @@ export const WalletDetailScreen: React.FC<Props> = ({ vaultId, walletId }) => {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#1976d2" />
+          <ActivityIndicator size="large" color={PRIMARY} />
         </View>
       </SafeAreaView>
     );
@@ -400,7 +414,7 @@ export const WalletDetailScreen: React.FC<Props> = ({ vaultId, walletId }) => {
             onChangeText={setRenameName}
             autoCapitalize="words"
             autoCorrect={false}
-            placeholderTextColor="#999"
+            placeholderTextColor={TEXT_TERTIARY}
             autoFocus
           />
           <View style={styles.modalButtons}>
@@ -427,7 +441,7 @@ export const WalletDetailScreen: React.FC<Props> = ({ vaultId, walletId }) => {
               disabled={renameLoading || !renameName.trim()}
             >
               {renameLoading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={TEXT_WHITE} size="small" />
               ) : (
                 <Text style={styles.submitBtnText}>Rename</Text>
               )}
@@ -498,7 +512,7 @@ export const WalletDetailScreen: React.FC<Props> = ({ vaultId, walletId }) => {
               disabled={addNetworkLoading || addNetworks.length === 0}
             >
               {addNetworkLoading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={TEXT_WHITE} size="small" />
               ) : (
                 <Text style={styles.submitBtnText}>Add</Text>
               )}
@@ -531,16 +545,16 @@ const infoStyles = StyleSheet.create({
   },
   border: {
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DIVIDER,
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   value: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
     maxWidth: '60%',
     textAlign: 'right',
   },
@@ -549,7 +563,7 @@ const infoStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   centered: {
     flex: 1,
@@ -571,7 +585,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: '#1976d2',
+    color: PRIMARY,
     fontWeight: '500',
   },
   section: {
@@ -586,12 +600,12 @@ const styles = StyleSheet.create({
   walletName: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
     flex: 1,
     marginRight: 8,
   },
   archivedBadgeContainer: {
-    backgroundColor: '#fff3e0',
+    backgroundColor: BG_LIGHT_ORANGE,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -599,7 +613,7 @@ const styles = StyleSheet.create({
   archivedBadgeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#ff9800',
+    color: WARNING,
   },
   networksRow: {
     flexDirection: 'row',
@@ -616,7 +630,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     borderCurve: 'continuous',
     padding: 16,
@@ -625,11 +639,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 12,
   },
   valueCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     borderCurve: 'continuous',
     padding: 20,
@@ -640,11 +654,11 @@ const styles = StyleSheet.create({
   totalValue: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   currencyCode: {
     fontSize: 14,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   actionsRow: {
     gap: 10,
@@ -656,24 +670,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   renameButton: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
   },
   archiveButton: {
-    backgroundColor: '#ff9800',
+    backgroundColor: WARNING,
   },
   unarchiveButton: {
-    backgroundColor: '#4caf50',
+    backgroundColor: SUCCESS,
   },
   addNetworkButton: {
-    backgroundColor: '#4caf50',
+    backgroundColor: SUCCESS,
   },
   actionButtonText: {
-    color: '#fff',
+    color: TEXT_WHITE,
     fontSize: 16,
     fontWeight: '600',
   },
   addressCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     borderCurve: 'continuous',
     padding: 14,
@@ -688,21 +702,21 @@ const styles = StyleSheet.create({
   },
   addressType: {
     fontSize: 12,
-    color: '#999',
+    color: TEXT_TERTIARY,
     fontWeight: '500',
   },
   addressValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
     fontFamily: 'Courier',
   },
   derivationPath: {
     fontSize: 12,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   balanceCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
     borderRadius: 12,
     borderCurve: 'continuous',
     padding: 14,
@@ -716,7 +730,7 @@ const styles = StyleSheet.create({
   assetId: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   balanceRow: {
     flexDirection: 'row',
@@ -725,17 +739,17 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     fontSize: 14,
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   balanceValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: TEXT_PRIMARY,
   },
   balanceValueLocked: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#ff9800',
+    color: WARNING,
   },
   emptyState: {
     alignItems: 'center',
@@ -743,34 +757,34 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: '#999',
+    color: TEXT_TERTIARY,
   },
   modalContainer: {
     flex: 1,
     padding: 24,
     paddingTop: 32,
-    backgroundColor: '#fff',
+    backgroundColor: BG_WHITE,
   },
   modalTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 24,
   },
   modalInput: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
     borderRadius: 10,
     borderCurve: 'continuous',
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#333',
+    color: TEXT_PRIMARY,
     marginBottom: 16,
   },
   modalLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
     marginBottom: 8,
   },
   networkPickerRow: {
@@ -783,12 +797,12 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: '#ddd',
+    borderColor: BORDER_MID,
   },
   networkOptionText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   modalButtons: {
     flexDirection: 'row',
@@ -802,19 +816,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelBtn: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: BG_MAIN,
   },
   cancelBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666',
+    color: TEXT_SECONDARY,
   },
   submitBtn: {
-    backgroundColor: '#1976d2',
+    backgroundColor: PRIMARY,
   },
   submitBtnText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: TEXT_WHITE,
   },
 });
