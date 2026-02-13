@@ -7,12 +7,15 @@ import {
   ScrollView,
   ActivityIndicator,
   Alert,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
+import { useVault } from '../hooks/useVault';
 import { fetchVault, fetchVaultUserProfile } from '../services/api';
-import { canManageMembers, getRoleColor } from '../utils/permissions';
+import { canManageMembers } from '../utils/permissions';
+import { VaultSwitcherHeader } from '../components/VaultSwitcherHeader';
 import type { Vault, VaultUserData } from '../types';
 
 interface Props {
@@ -21,11 +24,13 @@ interface Props {
 
 export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
   const { accessToken } = useAuth();
+  const { refreshVaults } = useVault();
   const router = useRouter();
 
   const [vault, setVault] = useState<Vault | null>(null);
   const [vaultUser, setVaultUser] = useState<VaultUserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!accessToken) return;
@@ -46,6 +51,7 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
       Alert.alert('Error', 'Failed to load vault details');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [accessToken, vaultId]);
 
@@ -55,6 +61,11 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
       loadData();
     }, [loadData]),
   );
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    Promise.all([loadData(), refreshVaults()]);
+  }, [loadData, refreshVaults]);
 
   if (loading) {
     return (
@@ -71,22 +82,24 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => router.back()}
-            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
-          >
-            <Text style={styles.backText}>← Back</Text>
-          </Pressable>
-        </View>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1976d2" />
+        }
+      >
+        {/* Vault Switcher Header */}
+        <VaultSwitcherHeader
+          currentVaultId={vaultId}
+          currentVaultName={vault?.name}
+          currentRole={role}
+        />
 
         {/* Vault Info */}
         {vault && (
           <View style={styles.section}>
-            <View style={styles.titleRow}>
-              <Text style={styles.vaultName}>{vault.name}</Text>
+            <View style={styles.statusRow}>
               <View
                 style={[
                   styles.statusBadge,
@@ -103,12 +116,6 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
                 </Text>
               </View>
             </View>
-
-            {role && (
-              <View style={[styles.roleBadge, { backgroundColor: getRoleColor(role) + '20' }]}>
-                <Text style={[styles.roleText, { color: getRoleColor(role) }]}>{role}</Text>
-              </View>
-            )}
 
             <View style={styles.card}>
               <InfoRow label="Email" value={vault.businessEmail || '—'} />
@@ -242,32 +249,12 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingBottom: 32,
   },
-  header: {
-    marginBottom: 16,
-  },
-  backButton: {
-    alignSelf: 'flex-start',
-  },
-  backText: {
-    fontSize: 16,
-    color: '#1976d2',
-    fontWeight: '500',
-  },
   section: {
     marginBottom: 24,
   },
-  titleRow: {
+  statusRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  vaultName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-    marginRight: 8,
+    marginBottom: 12,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -275,17 +262,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  roleBadge: {
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  roleText: {
     fontSize: 12,
     fontWeight: '600',
   },

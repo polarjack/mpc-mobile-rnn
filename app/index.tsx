@@ -2,19 +2,26 @@ import React, { useEffect } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../src/hooks/useAuth';
+import { useVault } from '../src/hooks/useVault';
 import { SignInScreen } from '../src/screens/SignInScreen';
 
 export default function Index() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { vaults, isInitialized: vaultInitialized } = useVault();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (authLoading || !isAuthenticated) return;
+    if (!vaultInitialized) return;
+
+    if (vaults.length > 0) {
+      router.replace(`/vaults/${vaults[0].id}`);
+    } else {
       router.replace('/vaults');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, authLoading, vaultInitialized, vaults, router]);
 
-  if (isLoading) {
+  if (authLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#1976d2" />
@@ -26,7 +33,6 @@ export default function Index() {
     return <SignInScreen />;
   }
 
-  // While navigating to home
   return (
     <View style={styles.loadingContainer}>
       <ActivityIndicator size="large" color="#1976d2" />

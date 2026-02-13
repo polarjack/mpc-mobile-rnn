@@ -279,6 +279,16 @@ export interface FetchAuditLogsParams {
   sortOrder?: SortOrder;
 }
 
+// Vault context type
+export interface VaultContextType {
+  vaults: Vault[];
+  memberships: VaultMembership[];
+  membershipMap: Map<string, VaultRole>;
+  isLoading: boolean;
+  isInitialized: boolean;
+  refreshVaults: () => Promise<void>;
+}
+
 // JWT token parts
 export interface JWTHeader {
   alg: string;

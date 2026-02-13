@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,11 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
-import { fetchVaults, fetchUserProfile } from '../services/api';
+import { useVault } from '../hooks/useVault';
 import { getRoleColor } from '../utils/permissions';
-import type { Vault, VaultRole, VaultMembership } from '../types';
+import type { Vault, VaultRole } from '../types';
 
 const keyExtractor = (item: Vault) => item.id;
 
@@ -67,48 +67,15 @@ const VaultCard = React.memo<VaultCardProps>(({ item, role, onPress }) => {
 });
 
 export const VaultListScreen: React.FC = () => {
-  const { accessToken, logout, isLoading } = useAuth();
+  const { logout, isLoading } = useAuth();
+  const { vaults, membershipMap, isLoading: vaultLoading, refreshVaults } = useVault();
   const router = useRouter();
 
-  const [vaults, setVaults] = useState<Vault[]>([]);
-  const [memberships, setMemberships] = useState<VaultMembership[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const loadData = useCallback(async () => {
-    if (!accessToken) return;
-    try {
-      const [vaultsRes, profileRes] = await Promise.all([
-        fetchVaults(accessToken),
-        fetchUserProfile(accessToken),
-      ]);
-      if (vaultsRes._status === 200 && vaultsRes.data) {
-        setVaults(vaultsRes.data);
-      } else {
-        Alert.alert('Error', vaultsRes.error?.message || 'Failed to load vaults');
-      }
-      if (profileRes._status === 200 && profileRes.data) {
-        setMemberships(profileRes.data.vaultMemberships);
-      }
-    } catch {
-      Alert.alert('Error', 'Failed to load vaults');
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [accessToken]);
-
-  useFocusEffect(
-    useCallback(() => {
-      setLoading(true);
-      loadData();
-    }, [loadData]),
-  );
+  const loading = vaultLoading && vaults.length === 0;
 
   const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    loadData();
-  }, [loadData]);
+    refreshVaults();
+  }, [refreshVaults]);
 
   const handleLogout = () => {
     Alert.alert('Confirm Logout', 'Are you sure you want to sign out?', [
@@ -116,14 +83,6 @@ export const VaultListScreen: React.FC = () => {
       { text: 'Sign Out', style: 'destructive', onPress: logout },
     ]);
   };
-
-  const membershipMap = useMemo(() => {
-    const map = new Map<string, VaultRole>();
-    for (const m of memberships) {
-      map.set(m.vaultId, m.role);
-    }
-    return map;
-  }, [memberships]);
 
   const handleVaultPress = useCallback(
     (id: string) => {
@@ -168,7 +127,7 @@ export const VaultListScreen: React.FC = () => {
         renderItem={renderVaultCard}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1976d2" />
+          <RefreshControl refreshing={vaultLoading} onRefresh={onRefresh} tintColor="#1976d2" />
         }
         ListEmptyComponent={
           <View style={styles.emptyState}>

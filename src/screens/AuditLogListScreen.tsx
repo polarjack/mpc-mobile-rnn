@@ -112,8 +112,6 @@ export const AuditLogListScreen: React.FC<Props> = ({ vaultId }) => {
         sortOrder: currentFilters.sortOrder,
       });
 
-      console.log('Fetched audit logs:', res);
-
       if (res._status === 200 && res.data) {
         setLogs((prev) => (append ? [...prev, ...res.data!] : res.data!));
         setPagination(res.pagination ?? null);
