@@ -18,6 +18,7 @@ import { fetchVault, fetchVaultUserProfile, fetchVaultBalances } from '../servic
 import { canManageMembers } from '../utils/permissions';
 import { VaultSwitcherHeader } from '../components/VaultSwitcherHeader';
 import { WalletListScreen } from './WalletListScreen';
+import { VaultActionsContent } from './VaultActionsContent';
 import {
   PRIMARY,
   SUCCESS,
@@ -40,7 +41,7 @@ import {
 } from '@/constants/colors';
 import type { Vault, VaultUserData, VaultRole, VaultBalance } from '../types';
 
-type TabKey = 'wallets' | 'balances' | 'settings';
+type TabKey = 'wallets' | 'balances' | 'actions' | 'settings';
 
 const currencyFormatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
@@ -162,6 +163,8 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
             refreshing={balancesRefreshing}
             onRefresh={onRefreshBalances}
           />
+        ) : activeTab === 'actions' ? (
+          <VaultActionsContent vaultId={vaultId} role={role} />
         ) : (
           <VaultOverviewContent
             vault={vault}
@@ -188,7 +191,12 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
           onPress={() => setActiveTab('balances')}
         />
         <TabButton
-          label="Vault Settings"
+          label="Actions"
+          active={activeTab === 'actions'}
+          onPress={() => setActiveTab('actions')}
+        />
+        <TabButton
+          label="Settings"
           active={activeTab === 'settings'}
           onPress={() => setActiveTab('settings')}
         />

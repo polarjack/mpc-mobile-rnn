@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-React Native (Expo SDK 54) iOS app implementing OAuth 2.0 Authorization Code Flow with PKCE against Keycloak SSO, with backend API integration using JWT tokens. Includes vault management features — vault listing, detail view, member management (CRUD with role-based permissions), vault settings, per-vault user profiles, wallet management (list, create, rename, archive, addresses, balances), and audit log viewing with filtering.
+React Native (Expo SDK 54) iOS app implementing OAuth 2.0 Authorization Code Flow with PKCE against Keycloak SSO, with backend API integration using JWT tokens. Includes vault management features — vault listing, detail view, member management (CRUD with role-based permissions), vault settings, per-vault user profiles, wallet management (list, create, rename, archive, addresses, balances), audit log viewing with filtering, and vault action management (list, approve, reject, cancel with role-based permissions).
 
 ## Commands
 
@@ -39,11 +39,13 @@ Wallet and audit-log routes each have their own nested Stack layout (`app/vaults
 
 Vault routes use a nested Stack layout in `app/vaults/_layout.tsx`. Dynamic segments use `useLocalSearchParams<{ id: string }>()`.
 
-**API client** (`src/services/api.ts`): Provides `authenticatedFetch<T>()` generic wrapper. All responses use the `ApiResponse<T>` envelope (`{ _status, data?, error? }`). Bearer token passed via Authorization header. Vault API functions: `fetchVaults`, `fetchVault`, `updateVault`, `fetchVaultUserProfile`, `fetchVaultMembers`, `addVaultMember`, `updateVaultMemberRole`, `deleteVaultMember`. Wallet API functions: `fetchWallets`, `createWallet`, `renameWallet`, `archiveWallet`, `unarchiveWallet`, `fetchWalletAddresses`, `addWalletAddress`, `fetchWalletBalances`. Audit log API functions: `fetchAuditLogs`, `fetchAuditLogDetail`.
+**API client** (`src/services/api.ts`): Provides `authenticatedFetch<T>()` generic wrapper. All responses use the `ApiResponse<T>` envelope (`{ _status, data?, error? }`). Bearer token passed via Authorization header. Vault API functions: `fetchVaults`, `fetchVault`, `updateVault`, `fetchVaultUserProfile`, `fetchVaultMembers`, `addVaultMember`, `updateVaultMemberRole`, `deleteVaultMember`. Wallet API functions: `fetchWallets`, `createWallet`, `renameWallet`, `archiveWallet`, `unarchiveWallet`, `fetchWalletAddresses`, `addWalletAddress`, `fetchWalletBalances`. Audit log API functions: `fetchAuditLogs`, `fetchAuditLogDetail`. Vault action API functions: `fetchVaultActions`, `approveVaultAction`, `rejectVaultAction`, `cancelVaultAction`.
 
 **Permissions** (`src/utils/permissions.ts`): Role-based helpers for UI gating — `canManageMembers(role)`, `canEditVault(role)`, `canManageWallets(role)`, `canManageMember(currentRole, targetRole)`, `getRoleColor(role)`, `getNetworkColor(network)`. Role hierarchy: OWNER > ADMIN > SIGNER > VIEWER.
 
 **Audit log utilities** (`src/utils/auditLog.ts`): Display helpers for audit events — `AUDIT_EVENT_LABELS` (human-readable labels), `getEventTypeColor(eventType)`, `getActorDisplayName(actor)`, `getActorSubtitle(actor)`, `formatAuditTimestamp(isoString)` (relative time formatting), `ALL_AUDIT_EVENT_TYPES`.
+
+**Vault action utilities** (`src/utils/vaultAction.ts`): Display helpers for vault actions — `VAULT_ACTION_TYPE_LABELS`, `VAULT_ACTION_STATUS_LABELS`, `getActionStatusColor(status)`, `getActionTypeColor(type)`, `ALL_VAULT_ACTION_TYPES`, `ALL_VAULT_ACTION_STATUSES`, `canRespondToAction(status)`, `canCancelAction(status)`, `getApprovalProgress(approvals, requiredApprovers)`.
 
 **Path alias**: `@/*` maps to `src/*` (configured in tsconfig.json).
 
@@ -65,6 +67,7 @@ Custom URL scheme `com.mpcmobile.auth` is registered in `app.json` under `expo.s
 - **Vault types**: `VaultRole` (`OWNER | ADMIN | SIGNER | VIEWER`), `Vault`, `VaultUserData`, `VaultMember`, `VaultMembership`, `Pagination`, `VaultMembersData`, plus request/response types for all vault CRUD operations.
 - **Wallet types**: `Network` (`BITCOIN | SOLANA`), `Wallet`, `WalletAddress`, `WalletBalance`, `DisplayedAddress`, `ConvertedValue`, `WalletPagination`, `WalletsData`, `CreateWalletRequest`, `UpdateWalletRequest`, `CreateWalletAddressRequest`, `FetchWalletsParams`.
 - **Audit log types**: `AuditEventType` (15 event types covering transactions, vault actions, and config changes), `ActorInfo` (discriminated union: `USER | SERVICE_ACCOUNT`), `AuditLogListItem`, `AuditLogDetail`, `AuditLogPagination`, `AuditLogsResponse`, `FetchAuditLogsParams`.
+- **Vault action types**: `VaultActionType` (14 action types), `VaultActionStatus` (8 statuses), `UserBrief`, `VaultActionApproval`, `VaultActionContent`, `VaultActionTimeline`, `VaultAction`, `VaultActionPagination`, `VaultActionsResponse`, `FetchVaultActionsParams`, `RejectVaultActionRequest`.
 - **Token storage keys**: `auth_access_token`, `auth_refresh_token`, `auth_access_token_expiry`, `auth_refresh_token_expiry` (stored individually in Keychain).
 - **OAuth scopes**: `openid`, `profile`, `email`, `offline_access`.
 - **Keycloak endpoints**: Built dynamically from realm URL in `src/config/auth.ts` via `getDiscoveryDocument()`.
@@ -76,5 +79,6 @@ Custom URL scheme `com.mpcmobile.auth` is registered in `app.json` under `expo.s
 - **Vault members screen**: Debounced search (300ms), infinite scroll pagination via `onEndReached`, modal for adding members, ActionSheet for edit/remove (permission-gated).
 - **Wallet screens**: `WalletListScreen` — paginated list with search and network filter, create wallet modal, archive/unarchive support. `WalletDetailScreen` — shows addresses, balances, converted values; supports rename, archive/unarchive, and add address actions.
 - **Audit log screens**: `AuditLogListScreen` — paginated list with search, date range filter, event type filter, color-coded event badges, relative timestamps. `AuditLogDetailScreen` — full event detail with actor info, IP address, and JSON payload display.
+- **Vault actions tab**: `VaultActionsContent` — embedded in vault detail as 4th tab ("Actions"). Paginated list with search, type/status filter chips, sort order toggle. Each row shows action type, initiator, approval progress, status badge, and timestamp. Approve/reject/cancel via Alert action sheet (role-gated: VIEWER excluded). Reject opens modal with optional reason input.
 - **No test framework configured** — no test files or Jest config exist yet.
 - **New Architecture enabled** in app.json.

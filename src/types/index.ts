@@ -290,6 +290,107 @@ export interface FetchAuditLogsParams {
   sortOrder?: SortOrder;
 }
 
+// ─── Vault Action Types ───
+
+export type VaultActionType =
+  | 'CHANGE_ADMIN_QUORUM_SIZE'
+  | 'CHANGE_VAULT_OWNER'
+  | 'CREATE_ADDRESS_BOOK_ENTRIES'
+  | 'CREATE_WALLET'
+  | 'DELETE_ADDRESS_BOOK_ENTRIES'
+  | 'INVITE_MEMBERS'
+  | 'REMOVE_MEMBERS'
+  | 'RENAME_VAULT'
+  | 'RENAME_WALLET'
+  | 'UPDATE_ADDRESS_BOOK_ENTRIES'
+  | 'UPDATE_MEMBER_ROLES'
+  | 'UPDATE_VAULT_INFO'
+  | 'ARCHIVE_WALLET'
+  | 'UNARCHIVE_WALLET';
+
+export type VaultActionStatus =
+  | 'PENDING_APPROVAL'
+  | 'REJECTED'
+  | 'PENDING_SIGNATURE'
+  | 'PENDING_EXECUTION'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'CANCELED'
+  | 'EXPIRED';
+
+export interface UserBrief {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface VaultActionApproval {
+  id: string;
+  vaultActionId: string;
+  approver: UserBrief;
+  approved: boolean;
+  reason?: string;
+  createdAt: string;
+}
+
+export type VaultActionContent = ChangeAdminQuorumSizeContent | Record<string, unknown>;
+
+export interface ChangeAdminQuorumSizeContent {
+  newQuorumSize: number;
+}
+
+export interface VaultActionTimeline {
+  id: string;
+  vaultActionId: string;
+  vaultActionStatus: VaultActionStatus;
+  createdAt: string;
+  description?: string;
+}
+
+export interface VaultAction {
+  id: string;
+  vaultId: string;
+  initiator: UserBrief;
+  type: VaultActionType;
+  status: VaultActionStatus;
+  requiredApprovers: number;
+  createdAt: string;
+  updatedAt: string;
+  approvals: VaultActionApproval[];
+  content: VaultActionContent;
+  timelines: VaultActionTimeline[];
+}
+
+export interface VaultActionPagination {
+  page: number;
+  limit: number;
+  totalPage: number;
+  totalCount: number;
+}
+
+export interface VaultActionsResponse {
+  _status: number;
+  data?: VaultAction[];
+  pagination?: VaultActionPagination;
+  error?: {
+    type: string;
+    message: string;
+  };
+}
+
+export interface FetchVaultActionsParams {
+  page?: number;
+  limit?: number;
+  initiator?: string;
+  types?: VaultActionType[];
+  statuses?: VaultActionStatus[];
+  sortOrder?: SortOrder;
+}
+
+export interface RejectVaultActionRequest {
+  reason?: string;
+}
+
 // Vault context type
 export interface VaultContextType {
   vaults: Vault[];

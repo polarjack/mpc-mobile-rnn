@@ -24,6 +24,10 @@ import type {
   AuditLogsResponse,
   AuditLogDetail,
   FetchAuditLogsParams,
+  VaultAction,
+  VaultActionsResponse,
+  FetchVaultActionsParams,
+  RejectVaultActionRequest,
 } from '../types';
 
 const API_BASE_URL = authConfig.backendApiUrl;
@@ -292,4 +296,63 @@ export const fetchAuditLogDetail = (
   authenticatedFetch<AuditLogDetail>(
     `/api/v1/vaults/${vaultId}/audit-logs/${logId}`,
     accessToken,
+  );
+
+// ─── Vault Action API ───
+
+export const fetchVaultActions = (
+  accessToken: string,
+  vaultId: string,
+  params?: FetchVaultActionsParams,
+): Promise<VaultActionsResponse> => {
+  const searchParams = new URLSearchParams();
+  if (params?.page !== undefined) searchParams.set('page', params.page.toString());
+  if (params?.limit !== undefined) searchParams.set('limit', params.limit.toString());
+  if (params?.initiator) searchParams.set('initiator', params.initiator);
+  if (params?.sortOrder) searchParams.set('sortOrder', params.sortOrder);
+  if (params?.types) {
+    for (const t of params.types) searchParams.append('types', t);
+  }
+  if (params?.statuses) {
+    for (const s of params.statuses) searchParams.append('statuses', s);
+  }
+  const query = searchParams.toString();
+  return authenticatedFetch<VaultAction[]>(
+    `/api/v1/vaults/${vaultId}/vault-actions${query ? `?${query}` : ''}`,
+    accessToken,
+  ) as Promise<VaultActionsResponse>;
+};
+
+export const approveVaultAction = (
+  accessToken: string,
+  vaultId: string,
+  actionId: string,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(
+    `/api/v1/vaults/${vaultId}/vault-actions/${actionId}/approve`,
+    accessToken,
+    { method: 'PUT' },
+  );
+
+export const rejectVaultAction = (
+  accessToken: string,
+  vaultId: string,
+  actionId: string,
+  data?: RejectVaultActionRequest,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(
+    `/api/v1/vaults/${vaultId}/vault-actions/${actionId}/reject`,
+    accessToken,
+    { method: 'PUT', body: data ? JSON.stringify(data) : undefined },
+  );
+
+export const cancelVaultAction = (
+  accessToken: string,
+  vaultId: string,
+  actionId: string,
+): Promise<ApiResponse<void>> =>
+  authenticatedFetch<void>(
+    `/api/v1/vaults/${vaultId}/vault-actions/${actionId}/cancel`,
+    accessToken,
+    { method: 'PUT' },
   );
