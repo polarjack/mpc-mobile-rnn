@@ -1,10 +1,11 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
   ScrollView,
+  FlatList,
   ActivityIndicator,
   Alert,
   RefreshControl,
@@ -13,7 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useAuth } from '../hooks/useAuth';
 import { useVault } from '../hooks/useVault';
-import { fetchVault, fetchVaultUserProfile } from '../services/api';
+import { fetchVault, fetchVaultUserProfile, fetchVaultBalances } from '../services/api';
 import { canManageMembers } from '../utils/permissions';
 import { VaultSwitcherHeader } from '../components/VaultSwitcherHeader';
 import { WalletListScreen } from './WalletListScreen';
@@ -37,9 +38,14 @@ import {
   SHADOW,
   TRANSPARENT,
 } from '@/constants/colors';
-import type { Vault, VaultUserData, VaultRole } from '../types';
+import type { Vault, VaultUserData, VaultRole, VaultBalance } from '../types';
 
-type TabKey = 'wallets' | 'settings';
+type TabKey = 'wallets' | 'balances' | 'settings';
+
+const currencyFormatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+});
 
 interface Props {
   vaultId: string;
@@ -55,6 +61,9 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>('wallets');
+  const [balances, setBalances] = useState<VaultBalance[]>([]);
+  const [balancesLoading, setBalancesLoading] = useState(false);
+  const [balancesRefreshing, setBalancesRefreshing] = useState(false);
 
   const loadData = useCallback(async () => {
     if (!accessToken) return;
@@ -91,6 +100,33 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
     Promise.all([loadData(), refreshVaults()]);
   }, [loadData, refreshVaults]);
 
+  const loadBalances = useCallback(async () => {
+    if (!accessToken) return;
+    setBalancesLoading(true);
+    try {
+      const res = await fetchVaultBalances(accessToken, vaultId);
+      if (res._status === 200 && res.data) {
+        setBalances(res.data);
+      }
+    } catch {
+      Alert.alert('Error', 'Failed to load balances');
+    } finally {
+      setBalancesLoading(false);
+      setBalancesRefreshing(false);
+    }
+  }, [accessToken, vaultId]);
+
+  const onRefreshBalances = useCallback(() => {
+    setBalancesRefreshing(true);
+    loadBalances();
+  }, [loadBalances]);
+
+  useEffect(() => {
+    if (activeTab === 'balances') {
+      loadBalances();
+    }
+  }, [activeTab, loadBalances]);
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -119,6 +155,13 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
       <View style={styles.tabContent}>
         {activeTab === 'wallets' ? (
           <WalletListScreen vaultId={vaultId} embedded role={role} />
+        ) : activeTab === 'balances' ? (
+          <VaultBalancesContent
+            balances={balances}
+            loading={balancesLoading}
+            refreshing={balancesRefreshing}
+            onRefresh={onRefreshBalances}
+          />
         ) : (
           <VaultOverviewContent
             vault={vault}
@@ -138,6 +181,11 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
           label="Wallets"
           active={activeTab === 'wallets'}
           onPress={() => setActiveTab('wallets')}
+        />
+        <TabButton
+          label="Balances"
+          active={activeTab === 'balances'}
+          onPress={() => setActiveTab('balances')}
         />
         <TabButton
           label="Vault Settings"
@@ -297,6 +345,99 @@ const InfoRow: React.FC<{ label: string; value: string; isLast?: boolean }> = ({
   </View>
 );
 
+// ─── Balances Tab ───
+
+interface VaultBalancesContentProps {
+  balances: VaultBalance[];
+  loading: boolean;
+  refreshing: boolean;
+  onRefresh: () => void;
+}
+
+const balanceKeyExtractor = (item: VaultBalance) => item.assetId;
+
+const BalanceCard = React.memo(function BalanceCard({ balance }: { balance: VaultBalance }) {
+  return (
+    <View style={balanceStyles.card}>
+      <View style={balanceStyles.cardHeader}>
+        <Text style={balanceStyles.assetId} numberOfLines={1}>
+          {balance.assetId}
+        </Text>
+      </View>
+      <View style={balanceStyles.row}>
+        <Text style={balanceStyles.label}>Amount</Text>
+        <Text style={balanceStyles.value}>{balance.amount}</Text>
+      </View>
+      <View style={balanceStyles.row}>
+        <Text style={balanceStyles.label}>Value</Text>
+        <Text style={balanceStyles.value}>
+          {currencyFormatter.format(parseFloat(balance.convertedValue.amount) || 0)}
+        </Text>
+      </View>
+      {balance.lockedAmount ? (
+        <View style={balanceStyles.row}>
+          <Text style={balanceStyles.label}>Locked</Text>
+          <Text style={balanceStyles.valueLocked}>{balance.lockedAmount}</Text>
+        </View>
+      ) : null}
+      {balance.walletBalances.length > 0 && (
+        <View style={balanceStyles.walletBreakdown}>
+          <Text style={balanceStyles.breakdownTitle}>Per Wallet</Text>
+          {balance.walletBalances.map((wb) => (
+            <View key={wb.walletId} style={balanceStyles.walletRow}>
+              <Text style={balanceStyles.walletName} numberOfLines={1}>
+                {wb.walletName}
+              </Text>
+              <View style={balanceStyles.walletValues}>
+                <Text style={balanceStyles.walletAmount}>{wb.amount}</Text>
+                <Text style={balanceStyles.walletConverted}>
+                  {currencyFormatter.format(parseFloat(wb.convertedValue.amount) || 0)}
+                </Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+    </View>
+  );
+});
+
+const renderBalanceItem = ({ item }: { item: VaultBalance }) => (
+  <BalanceCard balance={item} />
+);
+
+const VaultBalancesContent: React.FC<VaultBalancesContentProps> = ({
+  balances,
+  loading,
+  refreshing,
+  onRefresh,
+}) => {
+  if (loading && !refreshing) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color={PRIMARY} />
+      </View>
+    );
+  }
+
+  return (
+    <FlatList
+      data={balances}
+      keyExtractor={balanceKeyExtractor}
+      renderItem={renderBalanceItem}
+      contentContainerStyle={balanceStyles.listContent}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={PRIMARY} />
+      }
+      ListEmptyComponent={
+        <View style={balanceStyles.emptyState}>
+          <Text style={balanceStyles.emptyText}>No balances</Text>
+        </View>
+      }
+    />
+  );
+};
+
 const infoStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -436,5 +577,95 @@ const styles = StyleSheet.create({
   },
   tabButtonTextActive: {
     color: PRIMARY,
+  },
+});
+
+const balanceStyles = StyleSheet.create({
+  listContent: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  card: {
+    backgroundColor: BG_WHITE,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    gap: 6,
+    shadowColor: SHADOW,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  cardHeader: {
+    marginBottom: 4,
+  },
+  assetId: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: TEXT_SECONDARY,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  label: {
+    fontSize: 14,
+    color: TEXT_SECONDARY,
+  },
+  value: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: TEXT_PRIMARY,
+  },
+  valueLocked: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: WARNING,
+  },
+  walletBreakdown: {
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: DIVIDER,
+  },
+  breakdownTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: TEXT_TERTIARY,
+    marginBottom: 6,
+  },
+  walletRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  walletName: {
+    fontSize: 13,
+    color: TEXT_SECONDARY,
+    flex: 1,
+    marginRight: 8,
+  },
+  walletValues: {
+    alignItems: 'flex-end',
+  },
+  walletAmount: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: TEXT_PRIMARY,
+  },
+  walletConverted: {
+    fontSize: 12,
+    color: TEXT_TERTIARY,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingTop: 40,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: TEXT_TERTIARY,
   },
 });

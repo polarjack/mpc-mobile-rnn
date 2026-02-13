@@ -190,6 +190,17 @@ export interface WalletBalance {
   lockedConvertedValue?: ConvertedValue;
 }
 
+export interface VaultBalance {
+  assetId: string;
+  rawValue: string;
+  amount: string;
+  convertedValue: ConvertedValue;
+  lockedAmount?: string;
+  lockedConvertedValue?: ConvertedValue;
+  vaultId: string;
+  walletBalances: WalletBalance[];
+}
+
 export interface WalletPagination {
   page: number;
   limit: number;

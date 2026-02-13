@@ -14,6 +14,7 @@ import type {
   DeleteVaultMemberResponse,
   Wallet,
   WalletAddress,
+  VaultBalance,
   WalletBalance,
   FetchWalletsParams,
   CreateWalletRequest,
@@ -244,6 +245,15 @@ export const fetchWalletBalances = (
 ): Promise<ApiResponse<WalletBalance[]>> =>
   authenticatedFetch<WalletBalance[]>(
     `/api/v1/vaults/${vaultId}/wallets/${walletId}/balances`,
+    accessToken,
+  );
+
+export const fetchVaultBalances = (
+  accessToken: string,
+  vaultId: string,
+): Promise<ApiResponse<VaultBalance[]>> =>
+  authenticatedFetch<VaultBalance[]>(
+    `/api/v1/vaults/${vaultId}/balances`,
     accessToken,
   );
 
