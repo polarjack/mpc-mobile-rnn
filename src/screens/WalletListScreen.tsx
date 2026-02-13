@@ -90,9 +90,11 @@ const WalletCard = React.memo(function WalletCard({
 
 interface Props {
   vaultId: string;
+  embedded?: boolean;
+  role?: VaultRole | null;
 }
 
-export const WalletListScreen: React.FC<Props> = ({ vaultId }) => {
+export const WalletListScreen: React.FC<Props> = ({ vaultId, embedded, role: roleProp }) => {
   const { accessToken } = useAuth();
   const router = useRouter();
 
@@ -142,12 +144,16 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId }) => {
 
   useEffect(() => {
     const init = async () => {
-      await loadMyRole();
+      if (roleProp !== undefined) {
+        setMyRole(roleProp);
+      } else {
+        await loadMyRole();
+      }
       await loadWallets(1, '', false);
       setLoading(false);
     };
     init();
-  }, [loadMyRole, loadWallets]);
+  }, [loadMyRole, loadWallets, roleProp]);
 
   const handleSearch = (text: string) => {
     setSearch(text);
@@ -299,48 +305,62 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId }) => {
     [handleWalletPress, handleWalletLongPress],
   );
 
+  const Wrapper = embedded ? View : SafeAreaView;
+
   if (loading && wallets.length === 0) {
     return (
-      <SafeAreaView style={styles.container}>
+      <Wrapper style={styles.container}>
         <View style={styles.centered}>
           <ActivityIndicator size="large" color="#1976d2" />
         </View>
-      </SafeAreaView>
+      </Wrapper>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Pressable
-          onPress={() => router.back()}
-          style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
-        >
-          <Text style={styles.backText}>← Back</Text>
-        </Pressable>
-        <Text style={styles.headerTitle}>Wallets</Text>
-        {myRole && canManageWallets(myRole) ? (
+    <Wrapper style={styles.container}>
+      {/* Header (standalone mode only) */}
+      {!embedded && (
+        <View style={styles.header}>
           <Pressable
-            style={({ pressed }) => [styles.createButton, pressed && { opacity: 0.7 }]}
-            onPress={() => setShowCreateModal(true)}
+            onPress={() => router.back()}
+            style={({ pressed }) => [styles.backButton, pressed && { opacity: 0.7 }]}
           >
-            <Text style={styles.createButtonText}>+ Create</Text>
+            <Text style={styles.backText}>← Back</Text>
           </Pressable>
-        ) : null}
-      </View>
+          <Text style={styles.headerTitle}>Wallets</Text>
+          {myRole && canManageWallets(myRole) ? (
+            <Pressable
+              style={({ pressed }) => [styles.createButton, pressed && { opacity: 0.7 }]}
+              onPress={() => setShowCreateModal(true)}
+            >
+              <Text style={styles.createButtonText}>+ Create</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      )}
 
       {/* Search */}
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search wallets..."
-          value={search}
-          onChangeText={handleSearch}
-          placeholderTextColor="#999"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+        <View style={embedded ? styles.searchRow : undefined}>
+          <TextInput
+            style={[styles.searchInput, embedded && styles.searchInputFlex]}
+            placeholder="Search wallets..."
+            value={search}
+            onChangeText={handleSearch}
+            placeholderTextColor="#999"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {embedded && myRole && canManageWallets(myRole) ? (
+            <Pressable
+              style={({ pressed }) => [styles.createButton, pressed && { opacity: 0.7 }]}
+              onPress={() => setShowCreateModal(true)}
+            >
+              <Text style={styles.createButtonText}>+ Create</Text>
+            </Pressable>
+          ) : null}
+        </View>
       </View>
 
       {/* List */}
@@ -446,7 +466,7 @@ export const WalletListScreen: React.FC<Props> = ({ vaultId }) => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </Wrapper>
   );
 };
 
@@ -494,6 +514,14 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
     paddingBottom: 8,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  searchInputFlex: {
+    flex: 1,
   },
   searchInput: {
     backgroundColor: '#fff',

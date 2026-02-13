@@ -16,7 +16,10 @@ import { useVault } from '../hooks/useVault';
 import { fetchVault, fetchVaultUserProfile } from '../services/api';
 import { canManageMembers } from '../utils/permissions';
 import { VaultSwitcherHeader } from '../components/VaultSwitcherHeader';
-import type { Vault, VaultUserData } from '../types';
+import { WalletListScreen } from './WalletListScreen';
+import type { Vault, VaultUserData, VaultRole } from '../types';
+
+type TabKey = 'wallets' | 'settings';
 
 interface Props {
   vaultId: string;
@@ -31,6 +34,7 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
   const [vaultUser, setVaultUser] = useState<VaultUserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabKey>('wallets');
 
   const loadData = useCallback(async () => {
     if (!accessToken) return;
@@ -77,124 +81,188 @@ export const VaultDetailScreen: React.FC<Props> = ({ vaultId }) => {
     );
   }
 
-  const role = vaultUser?.role;
+  const role = vaultUser?.role ?? null;
   const showSettings = role ? canManageMembers(role) : false;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1976d2" />
-        }
-      >
-        {/* Vault Switcher Header */}
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      {/* Vault Switcher Header */}
+      <View style={styles.headerContainer}>
         <VaultSwitcherHeader
           currentVaultId={vaultId}
           currentVaultName={vault?.name}
-          currentRole={role}
+          currentRole={role ?? undefined}
         />
+      </View>
 
-        {/* Vault Info */}
-        {vault && (
-          <View style={styles.section}>
-            <View style={styles.statusRow}>
-              <View
-                style={[
-                  styles.statusBadge,
-                  { backgroundColor: vault.activated ? '#e8f5e9' : '#fce4ec' },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.statusText,
-                    { color: vault.activated ? '#4caf50' : '#f44336' },
-                  ]}
-                >
-                  {vault.activated ? 'Active' : 'Inactive'}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.card}>
-              <InfoRow label="Email" value={vault.businessEmail || '—'} />
-              <InfoRow label="Phone" value={vault.phone || '—'} />
-              <InfoRow label="Website" value={vault.websiteUrl || '—'} />
-              <InfoRow
-                label="Updated"
-                value={new Date(vault.updatedAt).toLocaleDateString()}
-                isLast
-              />
-            </View>
-          </View>
+      {/* Tab Content */}
+      <View style={styles.tabContent}>
+        {activeTab === 'wallets' ? (
+          <WalletListScreen vaultId={vaultId} embedded role={role} />
+        ) : (
+          <VaultOverviewContent
+            vault={vault}
+            vaultId={vaultId}
+            role={role}
+            showSettings={showSettings}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            router={router}
+          />
         )}
+      </View>
 
-        {/* Navigation */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Actions</Text>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.navButton,
-              styles.primaryButton,
-              pressed && { opacity: 0.7 },
-            ]}
-            onPress={() => router.push(`/vaults/${vaultId}/members`)}
-          >
-            <Text style={styles.navButtonText}>Members</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.navButton,
-              styles.walletsButton,
-              pressed && { opacity: 0.7 },
-            ]}
-            onPress={() => router.push(`/vaults/${vaultId}/wallets`)}
-          >
-            <Text style={styles.navButtonText}>Wallets</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.navButton,
-              styles.auditLogsButton,
-              pressed && { opacity: 0.7 },
-            ]}
-            onPress={() => router.push(`/vaults/${vaultId}/audit-logs`)}
-          >
-            <Text style={styles.navButtonText}>Audit Logs</Text>
-          </Pressable>
-
-          {showSettings && (
-            <Pressable
-              style={({ pressed }) => [
-                styles.navButton,
-                styles.settingsButton,
-                pressed && { opacity: 0.7 },
-              ]}
-              onPress={() => router.push(`/vaults/${vaultId}/settings`)}
-            >
-              <Text style={styles.navButtonText}>Settings</Text>
-            </Pressable>
-          )}
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.navButton,
-              styles.profileButton,
-              pressed && { opacity: 0.7 },
-            ]}
-            onPress={() => router.push(`/vaults/${vaultId}/profile`)}
-          >
-            <Text style={styles.navButtonText}>My Profile</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
+      {/* Bottom Tab Bar */}
+      <View style={styles.tabBar}>
+        <TabButton
+          label="Wallets"
+          active={activeTab === 'wallets'}
+          onPress={() => setActiveTab('wallets')}
+        />
+        <TabButton
+          label="Vault Settings"
+          active={activeTab === 'settings'}
+          onPress={() => setActiveTab('settings')}
+        />
+      </View>
     </SafeAreaView>
   );
 };
+
+const TabButton: React.FC<{ label: string; active: boolean; onPress: () => void }> = ({
+  label,
+  active,
+  onPress,
+}) => (
+  <Pressable
+    style={({ pressed }) => [
+      styles.tabButton,
+      active && styles.tabButtonActive,
+      pressed && { opacity: 0.7 },
+    ]}
+    onPress={onPress}
+  >
+    <Text style={[styles.tabButtonText, active && styles.tabButtonTextActive]}>{label}</Text>
+  </Pressable>
+);
+
+interface VaultOverviewProps {
+  vault: Vault | null;
+  vaultId: string;
+  role: VaultRole | null;
+  showSettings: boolean;
+  refreshing: boolean;
+  onRefresh: () => void;
+  router: ReturnType<typeof useRouter>;
+}
+
+const VaultOverviewContent: React.FC<VaultOverviewProps> = ({
+  vault,
+  vaultId,
+  role,
+  showSettings,
+  refreshing,
+  onRefresh,
+  router,
+}) => (
+  <ScrollView
+    style={styles.scrollView}
+    contentContainerStyle={styles.scrollContent}
+    refreshControl={
+      <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#1976d2" />
+    }
+  >
+    {/* Vault Info */}
+    {vault && (
+      <View style={styles.section}>
+        <View style={styles.statusRow}>
+          <View
+            style={[
+              styles.statusBadge,
+              { backgroundColor: vault.activated ? '#e8f5e9' : '#fce4ec' },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusText,
+                { color: vault.activated ? '#4caf50' : '#f44336' },
+              ]}
+            >
+              {vault.activated ? 'Active' : 'Inactive'}
+            </Text>
+          </View>
+          {role && (
+            <View style={styles.roleBadge}>
+              <Text style={styles.roleText}>{role}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.card}>
+          <InfoRow label="Email" value={vault.businessEmail || '—'} />
+          <InfoRow label="Phone" value={vault.phone || '—'} />
+          <InfoRow label="Website" value={vault.websiteUrl || '—'} />
+          <InfoRow
+            label="Updated"
+            value={new Date(vault.updatedAt).toLocaleDateString()}
+            isLast
+          />
+        </View>
+      </View>
+    )}
+
+    {/* Navigation */}
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>Actions</Text>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.navButton,
+          styles.primaryButton,
+          pressed && { opacity: 0.7 },
+        ]}
+        onPress={() => router.push(`/vaults/${vaultId}/members`)}
+      >
+        <Text style={styles.navButtonText}>Members</Text>
+      </Pressable>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.navButton,
+          styles.auditLogsButton,
+          pressed && { opacity: 0.7 },
+        ]}
+        onPress={() => router.push(`/vaults/${vaultId}/audit-logs`)}
+      >
+        <Text style={styles.navButtonText}>Audit Logs</Text>
+      </Pressable>
+
+      {showSettings && (
+        <Pressable
+          style={({ pressed }) => [
+            styles.navButton,
+            styles.settingsButton,
+            pressed && { opacity: 0.7 },
+          ]}
+          onPress={() => router.push(`/vaults/${vaultId}/settings`)}
+        >
+          <Text style={styles.navButtonText}>Settings</Text>
+        </Pressable>
+      )}
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.navButton,
+          styles.profileButton,
+          pressed && { opacity: 0.7 },
+        ]}
+        onPress={() => router.push(`/vaults/${vaultId}/profile`)}
+      >
+        <Text style={styles.navButtonText}>My Profile</Text>
+      </Pressable>
+    </View>
+  </ScrollView>
+);
 
 const InfoRow: React.FC<{ label: string; value: string; isLast?: boolean }> = ({
   label,
@@ -242,6 +310,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  headerContainer: {
+    padding: 16,
+    paddingBottom: 8,
+  },
+  tabContent: {
+    flex: 1,
+  },
   scrollView: {
     flex: 1,
   },
@@ -255,6 +330,7 @@ const styles = StyleSheet.create({
   statusRow: {
     flexDirection: 'row',
     marginBottom: 12,
+    gap: 8,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -264,6 +340,17 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 12,
     fontWeight: '600',
+  },
+  roleBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: '#e3f2fd',
+  },
+  roleText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1976d2',
   },
   card: {
     backgroundColor: '#fff',
@@ -290,9 +377,6 @@ const styles = StyleSheet.create({
   primaryButton: {
     backgroundColor: '#1976d2',
   },
-  walletsButton: {
-    backgroundColor: '#7b1fa2',
-  },
   auditLogsButton: {
     backgroundColor: '#607d8b',
   },
@@ -306,5 +390,31 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Bottom Tab Bar
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingBottom: 20,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 2,
+    borderTopColor: 'transparent',
+  },
+  tabButtonActive: {
+    borderTopColor: '#1976d2',
+  },
+  tabButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#999',
+  },
+  tabButtonTextActive: {
+    color: '#1976d2',
   },
 });
